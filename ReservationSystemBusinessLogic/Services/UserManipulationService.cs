@@ -51,5 +51,15 @@ namespace ReservationSystemBusinessLogic.Services
                 return new GenericStatusMessage(false, "Failed to add user, please contact support.");
             }
         }
+
+        public void ExpireToken(long userId)
+        {
+            using (ReservationDataContext context = new ReservationDataContext())
+            {
+                User user = context.Users.Single(x => x.Id == userId);
+                user.TokenExpiryDate = DateTime.UtcNow;
+                context.SaveChanges();
+            }
+        }
     }
 }

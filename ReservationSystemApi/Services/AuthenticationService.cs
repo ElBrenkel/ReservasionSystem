@@ -10,17 +10,22 @@ namespace ReservationSystemApi.Services
 {
     public static class AuthenticationService
     {
-        public const string TokenHeaderKey = "RS_TOKEN";
-        public const string UserHeaderKey = "RS_USER";
-        public static bool IsAuthorized(HttpRequest request, params UserRole[] requiredRoles)
+
+        /// <summary>
+        /// Returns the user's ID if token is valid, the user exists, and the role is correct.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="requiredRoles"></param>
+        /// <returns></returns>
+        public static long? IsAuthorized(HttpRequest request, params UserRole[] requiredRoles)
         {
-            if (request.Headers.ContainsKey(TokenHeaderKey) && request.Headers.ContainsKey(UserHeaderKey) && Guid.TryParse(request.Headers[TokenHeaderKey], out Guid token))
+            if (request.Headers.ContainsKey(Constants.TokenHeaderKey) && request.Headers.ContainsKey(Constants.UserHeaderKey) && Guid.TryParse(request.Headers[Constants.TokenHeaderKey], out Guid token))
             {
-                string username = request.Headers[UserHeaderKey];
+                string username = request.Headers[Constants.UserHeaderKey];
                 UserValidationService userValidationService = new UserValidationService();
                 return userValidationService.ValidateUserToken(username, token, requiredRoles);
             }
-            return false;
+            return null;
         }
     }
 }

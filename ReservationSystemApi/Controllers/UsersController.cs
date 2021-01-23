@@ -46,8 +46,49 @@ namespace ReservationSystemApi.Controllers
         [HttpGet("poke")]
         public GenericStatusMessage Poke()
         {
-            bool isAuthorized = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
-            return new GenericStatusMessage(isAuthorized);
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
+            return new GenericStatusMessage(userId != null);
+        }
+
+        [HttpPost("logout")]
+        public GenericStatusMessage Logout()
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+            }
+            else
+            {
+                UserManipulationService userManipulationService = new UserManipulationService();
+                userManipulationService.ExpireToken(userId.Value);
+            }
+
+            return new GenericStatusMessage(userId != null);
+        }
+
+        [HttpGet("")]
+        public GenericObjectResponse<GetUserResponse> GetUserData([FromQuery] string username)
+        {
+            GetUserResponse response = null;
+            long? queryingUserId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
+            if (queryingUserId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericObjectResponse<GetUserResponse>($"Unauthorized request.");
+            }
+            else
+            {
+                UserQueryService userQueryService = new UserQueryService();
+                response = userQueryService.FindUser(username, queryingUserId.Value);
+            }
+
+            if (response == null)
+            {
+                Response.StatusCode = 404;
+                return new GenericObjectResponse<GetUserResponse>($"Could not find user {username}.");
+            }
+            return new GenericObjectResponse<GetUserResponse>(response);
         }
     }
 }

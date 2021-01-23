@@ -17,7 +17,14 @@ namespace ReservationSystemBusinessLogic.Services
         private const string EmailRegexPattern = @"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$";
         private readonly TimeSpan TokenExpiryWindow = TimeSpan.FromHours(8);
 
-        public bool ValidateUserToken(string username, Guid token, UserRole[] requiredRoles)
+        /// <summary>
+        /// Returns the user's ID if token is valid, the user exists, and the role is correct.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="token"></param>
+        /// <param name="requiredRoles"></params
+        /// <returns></returns>
+        public long? ValidateUserToken(string username, Guid token, UserRole[] requiredRoles)
         {
             using (ReservationDataContext context = new())
             {
@@ -25,18 +32,18 @@ namespace ReservationSystemBusinessLogic.Services
                 if (user == null)
                 {
                     Logger.Debug($"{username} does not exist.");
-                    return false;
+                    return null;
                 }
 
                 if (user.TokenExpiryDate < DateTime.UtcNow)
                 {
                     Logger.Debug($"{username}'s token has expired.");
-                    return false;
+                    return null;
                 }
 
                 user.TokenExpiryDate = DateTime.UtcNow + TokenExpiryWindow;
                 context.SaveChanges();
-                return true;
+                return user.Id;
             }
         }
 
