@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReservationSystemBusinessLogic.Context.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -32,10 +33,12 @@ namespace ReservationSystemBusinessLogic.Objects
         [StringLength(50)]
         public string Street { get; set; }
 
-        public int BuildingNumber { get; set; }
+        public int? BuildingNumber { get; set; }
 
+        [DecimalPrecision(10,6)]
         public decimal? Lat { get; set; }
 
+        [DecimalPrecision(10, 6)]
         public decimal? Lon { get; set; }
 
         /// <summary>
@@ -44,5 +47,7 @@ namespace ReservationSystemBusinessLogic.Objects
         public bool IsActive { get; set; }
 
         public ICollection <WorkingHours> WorkingHours { get; set; }
+
+        public ICollection <ReservationRequest> Reservations { get; set; }
     }
 }

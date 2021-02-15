@@ -82,37 +82,7 @@ namespace ReservationSystemBusinessLogic.Services
                 return new GenericStatusMessage(false, "Passwords do not match.");
             }
 
-            if (!payload.FirstName.CheckLength(20, 2))
-            {
-                return new GenericStatusMessage(false, "First name cannot be empty.");
-            }
-
-            if (!payload.LastName.CheckLength(20, 2))
-            {
-                return new GenericStatusMessage(false, "Last name cannot be empty.");
-            }
-
-            if (!payload.Country.CheckLength(20, 2))
-            {
-                return new GenericStatusMessage(false, "Country cannot be empty.");
-            }
-
-            if (!payload.City.CheckLength(20, 2))
-            {
-                return new GenericStatusMessage(false, "City cannot be empty.");
-            }
-
-            if (!payload.Street.CheckLength(50, 2))
-            {
-                return new GenericStatusMessage(false, "Street cannot be empty.");
-            }
-
-            if (payload.BuildingNumber <= 0)
-            {
-                return new GenericStatusMessage(false, "Building number cannot be non positive.");
-            }
-
-            return new GenericStatusMessage(true);
+            return ValidateUserData(payload);
         }
 
         public LoginResponse ValidateLogin(string username, string password)
@@ -138,6 +108,31 @@ namespace ReservationSystemBusinessLogic.Services
                 context.SaveChanges();
                 return new LoginResponse() { Token = user.Token };
             }
+        }
+
+        public GenericStatusMessage ValidateUserData(ChangeUserDataPayload payload, bool required = true)
+        {
+            ValidationHelper helper = new ValidationHelper();
+            List<GenericStatusMessage> validations = new List<GenericStatusMessage>
+            {
+                helper.ValidateStringValue(payload.FirstName, "First name", 2, 20, required),
+                helper.ValidateStringValue(payload.LastName, "Last name", 2, 20, required),
+                helper.ValidateStringValue(payload.Country, "Country", 2, 20, required),
+                helper.ValidateStringValue(payload.City, "City", 2, 20, required),
+                helper.ValidateStringValue(payload.Street, "Street", 2, 50, required)
+            };
+
+            bool buildingValueExists = required || payload.BuildingNumber.HasValue;
+            if (buildingValueExists && payload.BuildingNumber <= 0)
+            {
+                validations.Add(new GenericStatusMessage(false, "Building number cannot be non positive."));
+            }
+
+            if (validations.Any(x => !x.Success))
+            {
+                return validations.First(x => !x.Success);
+            }
+            return new GenericStatusMessage(true);
         }
     }
 }

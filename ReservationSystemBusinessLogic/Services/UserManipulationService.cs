@@ -1,4 +1,5 @@
-﻿using ReservationSystemBusinessLogic.Context;
+﻿using ReservationSystemApi.Objects;
+using ReservationSystemBusinessLogic.Context;
 using ReservationSystemBusinessLogic.Enums;
 using ReservationSystemBusinessLogic.Log;
 using ReservationSystemBusinessLogic.Objects;
@@ -14,7 +15,7 @@ namespace ReservationSystemBusinessLogic.Services
 {
     public class UserManipulationService
     {
-        private User ConvertFromPayload(CreateUserPayload payload, UserRole role)
+        private User ConvertUserFromPayload(CreateUserPayload payload, UserRole role)
         {
             return new User
             {
@@ -30,6 +31,20 @@ namespace ReservationSystemBusinessLogic.Services
             };
         }
 
+        private UserResponse ConvertUserToUserResponse(User user)
+        {
+            return new UserResponse
+            {
+                Username = user.Username,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Country = user.Country,
+                City = user.City,
+                Street = user.Street,
+                BuildingNumber = user.BuildingNumber
+            };
+        }
+
         public GenericStatusMessage AddUser(CreateUserPayload payload, UserRole role)
         {
             try
@@ -37,7 +52,7 @@ namespace ReservationSystemBusinessLogic.Services
                 Logger.Debug($"Attempting to create new user {payload.Username}");
                 using (ReservationDataContext context = new ReservationDataContext())
                 {
-                    User user = ConvertFromPayload(payload, role);
+                    User user = ConvertUserFromPayload(payload, role);
                     context.Users.Add(user);
                     context.SaveChanges();
                 }
@@ -59,6 +74,54 @@ namespace ReservationSystemBusinessLogic.Services
                 User user = context.Users.Single(x => x.Id == userId);
                 user.TokenExpiryDate = DateTime.UtcNow;
                 context.SaveChanges();
+            }
+        }
+
+        public GenericStatusMessage ChangePassword(PasswordChangePayload payload, long userId)
+        {
+            using (ReservationDataContext context = new())
+            {
+                User user = context.Users.Single(x => x.Id == userId);
+                bool correctPassword = PasswordHasher.Validate(payload.CurrentPassword, user.PasswordHash);
+                if (!correctPassword)
+                {
+                    Logger.Debug($"{user.Username} failed to change password due to incorrect password.");
+                    return new GenericStatusMessage(false, "Password incorrect.");
+                }
+                else if (payload.NewPassword != payload.NewPasswordAgain)
+                {
+                    Logger.Debug($"{user.Username} failed to change password due to mismatching passwords.");
+                    return new GenericStatusMessage(false, "Passwords do not match.");
+                }
+
+                user.PasswordHash = PasswordHasher.Create(payload.NewPassword);
+                context.SaveChanges();
+                return new GenericStatusMessage(true);
+            }
+        }
+
+        public GenericObjectResponse<UserResponse> ChangeUserData(ChangeUserDataPayload payload, long userId)
+        {
+            UserValidationService service = new UserValidationService();
+            GenericStatusMessage validationResponse = service.ValidateUserData(payload, false);
+            if (validationResponse.Success)
+            {
+                using (ReservationDataContext context = new())
+                {
+                    User user = context.Users.Single(x => x.Id == userId);
+                    user.FirstName = payload.FirstName ?? user.FirstName;
+                    user.LastName = payload.LastName ?? user.LastName;
+                    user.Country = payload.Country ?? user.Country;
+                    user.City = payload.City ?? user.City;
+                    user.Street = payload.Street ?? user.Street;
+                    user.BuildingNumber = payload.BuildingNumber ?? user.BuildingNumber;
+                    context.SaveChanges();
+                    return new GenericObjectResponse<UserResponse>(ConvertUserToUserResponse(user));
+                }
+            }
+            else
+            {
+                return new GenericObjectResponse<UserResponse>(validationResponse.Message);
             }
         }
     }

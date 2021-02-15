@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ReservationSystemApi</name>
+    </assembly>
+    <members>
+        <member name="M:ReservationSystemApi.Services.AuthenticationService.IsAuthorized(Microsoft.AspNetCore.Http.HttpRequest,ReservationSystemBusinessLogic.Enums.UserRole[])">
+            <summary>
+            Returns the user's ID if token is valid, the user exists, and the role is correct.
+            </summary>
+            <param name="request"></param>
+            <param name="requiredRoles"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

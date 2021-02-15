@@ -13,7 +13,7 @@ namespace ReservationSystemBusinessLogic.Services
 {
     public class UserQueryService
     {
-        public GetUserResponse FindUser(string usernameToFind, long queryingUserId)
+        public UserResponse FindUser(string usernameToFind, long queryingUserId)
         {
             using (ReservationDataContext context = new ReservationDataContext())
             {
@@ -37,9 +37,9 @@ namespace ReservationSystemBusinessLogic.Services
             }
         }
 
-        private GetUserResponse ConvertFromUser(User user)
+        private UserResponse ConvertFromUser(User user)
         {
-            return new GetUserResponse()
+            return new UserResponse()
             {
                 Username = user.Username,
                 FirstName = user.FirstName,

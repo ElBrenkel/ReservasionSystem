@@ -6,10 +6,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.IO;
 
 namespace ReservationSystemApi
 {
@@ -30,6 +34,24 @@ namespace ReservationSystemApi
             {
                 options.AddPolicy("AllowAllOrigins",
                     builder => builder.AllowAnyOrigin());
+            });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "",
+                    Version = "v1",
+                    Description = "",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact()
+                    {
+                        Name = ""
+                    },
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+                c.OperationFilter<AddRequiredHeaderParameter>();
             });
         }
 
@@ -56,6 +78,13 @@ namespace ReservationSystemApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1");
+                c.RoutePrefix = string.Empty;
             });
         }
     }

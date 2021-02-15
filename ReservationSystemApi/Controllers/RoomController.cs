@@ -1,0 +1,209 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using ReservationSystemApi.Objects;
+using ReservationSystemApi.Services;
+using ReservationSystemBusinessLogic.Common;
+using ReservationSystemBusinessLogic;
+using ReservationSystemBusinessLogic.Enums;
+using ReservationSystemBusinessLogic.Objects.Api;
+using ReservationSystemBusinessLogic.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace ReservationSystemApi.Controllers
+{
+    [Route("api/room")]
+    public class RoomController : Controller
+    {
+        [HttpPost("")]
+        public async Task<GenericObjectResponse<RoomResponse>> AddRoom([FromBody] CreateRoomPayload payload)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericObjectResponse<RoomResponse>("");
+            }
+
+            RoomManipulationService service = new RoomManipulationService();
+            GenericObjectResponse<RoomResponse> response = await service.AddRoom(payload, userId);
+            if (!response.Status.Success)
+            {
+                Response.StatusCode = 400;
+            }
+
+            return response;
+        }
+
+        [HttpPost("{roomId}/workingHours")]
+        public GenericObjectResponse<List<WorkingHoursPayload>> ChangeWorkingHours(long roomId, [FromBody] List<WorkingHoursPayload> payload)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericObjectResponse<List<WorkingHoursPayload>>("");
+            }
+
+            RoomValidationService roomValidationService = new RoomValidationService();
+            GenericStatusMessage roomExistsValidation = roomValidationService.ValidateRoomExistsAndOwnedByUser(roomId, userId.Value);
+            if (!roomExistsValidation.Success)
+            {
+                Response.StatusCode = 404;
+                return new GenericObjectResponse<List<WorkingHoursPayload>>("Not found.");
+            }
+
+            WorkingHoursManipulationService service = new WorkingHoursManipulationService();
+            GenericObjectResponse<List<WorkingHoursPayload>> response = service.ChangeWorkingHoursForRoom(roomId, payload);
+            if (!response.Status.Success)
+            {
+                Response.StatusCode = 400;
+            }
+
+            return response;
+        }
+
+        [HttpPatch("{roomId}")]
+        public async Task<GenericObjectResponse<RoomResponse>> ChangeRoomData([FromBody] CreateRoomPayload payload, long roomId)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericObjectResponse<RoomResponse>("");
+            }
+
+            RoomValidationService roomValidationService = new RoomValidationService();
+            GenericStatusMessage roomExistsValidation = roomValidationService.ValidateRoomExistsAndOwnedByUser(roomId, userId.Value);
+            if (!roomExistsValidation.Success)
+            {
+                Response.StatusCode = 404;
+                return new GenericObjectResponse<RoomResponse>("Not found.");
+            }
+            RoomManipulationService roomManipulationService = new RoomManipulationService();
+            return await roomManipulationService.ChangeRoomData(payload, roomId);
+        }
+
+        [HttpGet("{roomId}")]
+        public GenericObjectResponse<RoomResponse> GetRoomById(long roomId, [FromQuery] bool expand = false)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner, UserRole.Coach);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericObjectResponse<RoomResponse>("");
+            }
+
+            RoomQueryService queryService = new RoomQueryService();
+            var room = queryService.GetRoomById(roomId, expand);
+            if (!room.Status.Success)
+            {
+                Response.StatusCode = 404;
+            }
+
+            return room;
+        }
+
+        [HttpGet("nearby")]
+        public GenericListResponse<RoomResponse> GetNearbyRooms([FromQuery] decimal lat, [FromQuery] decimal lon, [FromQuery] int radius,
+            [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner, UserRole.Coach);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericListResponse<RoomResponse>("");
+            }
+
+            RoomQueryService queryService = new RoomQueryService();
+            return queryService.GetRoomsByLatLonAndRadius(lat, lon, radius, skip, take);
+        }
+
+        [HttpGet("search")]
+        public GenericListResponse<RoomResponse> GetNearbyCity([FromQuery] string city, [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner, UserRole.Coach);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericListResponse<RoomResponse>("");
+            }
+
+            RoomQueryService queryService = new RoomQueryService();
+            return queryService.GetRoomsByCity(city, skip, take);
+        }
+
+        [HttpPost("{roomId}/request")]
+        public GenericObjectResponse<ReservationRequesrResponse> RequestReservation(long roomId, [FromBody] ReservationRequestPayload payload)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner, UserRole.Coach);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericObjectResponse<ReservationRequesrResponse>("");
+            }
+
+            ReservationRequestPayload trimmedPayload = new ReservationRequestPayload()
+            {
+                Description = payload.Description,
+                RentStart = payload.RentStart.TrimDate(DateTimePrecision.Minute),
+                RentEnd = payload.RentEnd.TrimDate(DateTimePrecision.Minute)
+            };
+            ReservationValidationService reservationValidationService = new ReservationValidationService();
+            GenericStatusMessage roomAvailabilityValidation = reservationValidationService.ValidateRoomAvailability(roomId, userId.Value, trimmedPayload);
+            if (!roomAvailabilityValidation.Success)
+            {
+                Response.StatusCode = 400;
+                return new GenericObjectResponse<ReservationRequesrResponse>(roomAvailabilityValidation.Message);
+            }
+
+            ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
+            return reservationManipulationService.AddReservation(roomId, userId.Value, trimmedPayload);
+        }
+
+        [HttpPost("{roomId}/request/{requestId}/accept")]
+        public GenericStatusMessage ApproveReservation(long roomId, long requestId)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericStatusMessage(false, "");
+            }
+
+            ReservationValidationService reservationValidationService = new ReservationValidationService();
+            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequestExists(roomId, requestId);
+            if (!requestExistsValidation.Success)
+            {
+                Response.StatusCode = 400;
+                return new GenericStatusMessage(false, requestExistsValidation.Message);
+            }
+
+            ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
+            return reservationManipulationService.ChangeReservationApproval(roomId, requestId, ReservationStatus.Approved);
+        }
+
+        [HttpPost("{roomId}/request/{requestId}/reject")]
+        public GenericStatusMessage RejectReservation(long roomId, long requestId)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericStatusMessage(false, "");
+            }
+
+            ReservationValidationService reservationValidationService = new ReservationValidationService();
+            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequestExists(roomId, requestId);
+            if (!requestExistsValidation.Success)
+            {
+                Response.StatusCode = 400;
+                return new GenericStatusMessage(false, requestExistsValidation.Message);
+            }
+
+            ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
+            return reservationManipulationService.ChangeReservationApproval(roomId, requestId, ReservationStatus.Rejected);
+        }
+    }
+}

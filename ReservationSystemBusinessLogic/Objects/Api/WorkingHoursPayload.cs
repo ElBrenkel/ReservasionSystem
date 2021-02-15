@@ -1,22 +1,17 @@
-﻿using ReservationSystemBusinessLogic.Enums;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using ReservationSystemBusinessLogic.Enums;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace ReservationSystemBusinessLogic.Objects
+namespace ReservationSystemBusinessLogic.Objects.Api
 {
-    public class WorkingHours
+    public class WorkingHoursPayload
     {
-        public long Id{ get; set; }
-
-        public long? RoomId{ get; set; }
-
-        [ForeignKey("RoomId")]
-        public Room Room{ get; set; }
-
+        [JsonConverter(typeof(StringEnumConverter))]
         public Days Day { get; set; }
 
         /// <summary>

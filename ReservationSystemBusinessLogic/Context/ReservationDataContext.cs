@@ -1,4 +1,6 @@
-﻿using ReservationSystemBusinessLogic.Objects;
+﻿using ReservationSystemBusinessLogic.Context.Attributes;
+using ReservationSystemBusinessLogic.Context.Migrations;
+using ReservationSystemBusinessLogic.Objects;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -8,7 +10,10 @@ namespace ReservationSystemBusinessLogic.Context
 {
     public class ReservationDataContext : DbContext
     {
-        public ReservationDataContext() : base(Constants.ConnectionString) { }
+        public ReservationDataContext() : base(Constants.ConnectionString)
+        {
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ReservationDataContext, Configuration>());
+        }
 
         public DbSet<WorkingHours> WorkingHours { get; set; }
         public DbSet<ReservationRequest> ReservationRequests { get; set; }
@@ -21,6 +26,12 @@ namespace ReservationSystemBusinessLogic.Context
             Rooms.Create();
             WorkingHours.Create();
             WorkingHours.Create();
+        }
+
+        protected override void OnModelCreating(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Conventions.Add(new DecimalPrecisionAttributeConvention());
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
