@@ -79,7 +79,7 @@ namespace ReservationSystemBusinessLogic.Services
 
         public GenericStatusMessage ChangePassword(PasswordChangePayload payload, long userId)
         {
-            using (ReservationDataContext context = new())
+            using (ReservationDataContext context = new ReservationDataContext())
             {
                 User user = context.Users.Single(x => x.Id == userId);
                 bool correctPassword = PasswordHasher.Validate(payload.CurrentPassword, user.PasswordHash);
@@ -106,7 +106,7 @@ namespace ReservationSystemBusinessLogic.Services
             GenericStatusMessage validationResponse = service.ValidateUserData(payload, false);
             if (validationResponse.Success)
             {
-                using (ReservationDataContext context = new())
+                using (ReservationDataContext context = new ReservationDataContext())
                 {
                     User user = context.Users.Single(x => x.Id == userId);
                     user.FirstName = payload.FirstName ?? user.FirstName;

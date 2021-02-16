@@ -26,7 +26,7 @@ namespace ReservationSystemBusinessLogic.Services
         /// <returns></returns>
         public long? ValidateUserToken(string username, Guid token, UserRole[] requiredRoles)
         {
-            using (ReservationDataContext context = new())
+            using (ReservationDataContext context = new ReservationDataContext())
             {
                 User user = context.Users.SingleOrDefault(x => x.Username == username && x.Token == token && requiredRoles.Contains(x.Role));
                 if (user == null)
@@ -63,7 +63,7 @@ namespace ReservationSystemBusinessLogic.Services
                 return new GenericStatusMessage(false, "Username is not an email.");
             }
 
-            using (ReservationDataContext context = new())
+            using (ReservationDataContext context = new ReservationDataContext())
             {
                 bool usernameExists = context.Users.Any(x => x.Username == payload.Username);
                 if (usernameExists)
@@ -87,7 +87,7 @@ namespace ReservationSystemBusinessLogic.Services
 
         public LoginResponse ValidateLogin(string username, string password)
         {
-            using (ReservationDataContext context = new())
+            using (ReservationDataContext context = new ReservationDataContext())
             {
                 User user = context.Users.FirstOrDefault(x => x.Username == username);
                 if (user == null)

@@ -29,6 +29,15 @@ namespace ReservationSystemBusinessLogic.Services
             return validations.FirstOrDefault(x => !x.Success) ?? new GenericStatusMessage(true);
         }
 
+        public GenericStatusMessage ValidateRoomExists(long roomId)
+        {
+            using (ReservationDataContext context = new ReservationDataContext())
+            {
+                bool exists = context.Rooms.Any(x => x.Id == roomId);
+                return new GenericStatusMessage(exists);
+            }
+        }
+
         public GenericStatusMessage ValidateRoomExistsAndOwnedByUser(long roomId, long userId)
         {
             using (ReservationDataContext context = new ReservationDataContext())

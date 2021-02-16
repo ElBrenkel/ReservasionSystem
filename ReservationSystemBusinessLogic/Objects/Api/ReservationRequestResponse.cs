@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ReservationSystemBusinessLogic.Objects.Api
 {
-    public class ReservationRequesrResponse
+    public class ReservationRequestResponse
     {
 
         public long? UserId { get; set; }
@@ -18,7 +18,7 @@ namespace ReservationSystemBusinessLogic.Objects.Api
 
         public DateTime RentEnd { get; set; }
 
-        public decimal FinalPrice { get; set; }
+        public decimal? FinalPrice { get; set; }
 
         public string Description { get; set; }
 

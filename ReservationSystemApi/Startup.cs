@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace ReservationSystemApi
 {
@@ -29,7 +30,7 @@ namespace ReservationSystemApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigins",

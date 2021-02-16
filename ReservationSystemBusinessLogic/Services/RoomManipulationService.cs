@@ -111,7 +111,7 @@ namespace ReservationSystemBusinessLogic.Services
             RoomResponse roomResponse = null;
             if (validationResponse.Success)
             {
-                using (ReservationDataContext context = new())
+                using (ReservationDataContext context = new ReservationDataContext())
                 {
                     Room room = context.Rooms.Include(x => x.WorkingHours).Single(x => x.Id == roomId);
                     room.Size = payload.Size ?? room.Size;
@@ -141,7 +141,7 @@ namespace ReservationSystemBusinessLogic.Services
 
         private async Task<LatLon> AddLatLonForRoom(long roomId)
         {
-            using (ReservationDataContext context = new())
+            using (ReservationDataContext context = new ReservationDataContext())
             {
                 Room room = context.Rooms.Single(x => x.Id == roomId);
                 IGeolocationClient geolocationClient = new MapQuestClient();
@@ -158,6 +158,36 @@ namespace ReservationSystemBusinessLogic.Services
                     Logger.Error($"Failed to extract lat lon information for {roomId}: {e.Message}");
                     return null;
                 }
+            }
+        }
+
+        public GenericStatusMessage ChangeRoomActivation(long roomId, bool activate, bool force)
+        {
+            DateTime now = DateTime.Now;
+            using (ReservationDataContext context = new ReservationDataContext())
+            {
+                Room room = context.Rooms.Include(x => x.Reservations).Single(x => x.Id == roomId);
+                if (!activate)
+                {
+                    bool hasFutureReservations = room.Reservations.Any(x => x.RentStart >= now && x.Status != ReservationStatus.Rejected);
+                    if (hasFutureReservations)
+                    {
+                        if (!force)
+                        {
+                            return new GenericStatusMessage(false, "Could not complete operation, room has future reservations.");
+                        }
+
+                        IEnumerable<ReservationRequest> futureReservations = room.Reservations.Where(x => x.RentStart >= now && x.Status != ReservationStatus.Rejected);
+                        foreach (ReservationRequest reservation in futureReservations)
+                        {
+                            reservation.Status = ReservationStatus.Rejected;
+                        }
+                    }
+                }
+
+                room.IsActive = activate;
+                context.SaveChanges();
+                return new GenericStatusMessage(true);
             }
         }
     }

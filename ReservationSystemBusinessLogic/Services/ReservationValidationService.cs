@@ -61,20 +61,24 @@ namespace ReservationSystemBusinessLogic.Services
             return room.WorkingHours.FirstOrDefault(x => x.Day == reservationDay && x.TimeStart <= reservationStartTime && x.TimeEnd >= resevationEndTime);
         }
 
-        public GenericStatusMessage ValidateRequestExists(long roomId, long requestId)
+        public GenericStatusMessage ValidateRequest(long roomId, long requestId, long userId)
         {
             using (ReservationDataContext context = new ReservationDataContext())
             {
-                ReservationRequest reservationRequest = context.ReservationRequests.SingleOrDefault(x => x.Id == requestId);
+                ReservationRequest reservationRequest = context.ReservationRequests.Include(x => x.Room).SingleOrDefault(x => x.Id == requestId);
                 if (reservationRequest == null)
                 {
                     return new GenericStatusMessage(false, $"Reservation with ID {requestId} does not exist.");
                 }
 
-                bool isRequstExists = context.Rooms.Include(x => x.Reservations).Any(x => x.Id == roomId && x.Reservations.Contains(reservationRequest));
-                if (!isRequstExists)
+                if (reservationRequest.RoomId != roomId)
                 {
                     return new GenericStatusMessage(false, $"Request {requestId} does not belong to room {roomId}.");
+                }
+
+                if (reservationRequest.Room.OwnerId != userId)
+                {
+                    return new GenericStatusMessage(false, $"Request {requestId} can not be verified by user.");
                 }
 
                 return new GenericStatusMessage(true);

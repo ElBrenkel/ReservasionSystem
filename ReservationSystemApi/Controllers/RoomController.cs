@@ -81,6 +81,7 @@ namespace ReservationSystemApi.Controllers
                 Response.StatusCode = 404;
                 return new GenericObjectResponse<RoomResponse>("Not found.");
             }
+
             RoomManipulationService roomManipulationService = new RoomManipulationService();
             return await roomManipulationService.ChangeRoomData(payload, roomId);
         }
@@ -135,13 +136,13 @@ namespace ReservationSystemApi.Controllers
         }
 
         [HttpPost("{roomId}/request")]
-        public GenericObjectResponse<ReservationRequesrResponse> RequestReservation(long roomId, [FromBody] ReservationRequestPayload payload)
+        public GenericObjectResponse<ReservationRequestResponse> RequestReservation(long roomId, [FromBody] ReservationRequestPayload payload)
         {
             long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner, UserRole.Coach);
             if (userId == null)
             {
                 Response.StatusCode = 401;
-                return new GenericObjectResponse<ReservationRequesrResponse>("");
+                return new GenericObjectResponse<ReservationRequestResponse>("");
             }
 
             ReservationRequestPayload trimmedPayload = new ReservationRequestPayload()
@@ -155,7 +156,7 @@ namespace ReservationSystemApi.Controllers
             if (!roomAvailabilityValidation.Success)
             {
                 Response.StatusCode = 400;
-                return new GenericObjectResponse<ReservationRequesrResponse>(roomAvailabilityValidation.Message);
+                return new GenericObjectResponse<ReservationRequestResponse>(roomAvailabilityValidation.Message);
             }
 
             ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
@@ -165,7 +166,7 @@ namespace ReservationSystemApi.Controllers
         [HttpPost("{roomId}/request/{requestId}/accept")]
         public GenericStatusMessage ApproveReservation(long roomId, long requestId)
         {
-            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach);
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
             if (userId == null)
             {
                 Response.StatusCode = 401;
@@ -173,7 +174,7 @@ namespace ReservationSystemApi.Controllers
             }
 
             ReservationValidationService reservationValidationService = new ReservationValidationService();
-            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequestExists(roomId, requestId);
+            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequest(roomId, requestId, userId.Value);
             if (!requestExistsValidation.Success)
             {
                 Response.StatusCode = 400;
@@ -181,13 +182,13 @@ namespace ReservationSystemApi.Controllers
             }
 
             ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
-            return reservationManipulationService.ChangeReservationApproval(roomId, requestId, ReservationStatus.Approved);
+            return reservationManipulationService.ChangeReservationApproval(requestId, ReservationStatus.Approved);
         }
 
         [HttpPost("{roomId}/request/{requestId}/reject")]
         public GenericStatusMessage RejectReservation(long roomId, long requestId)
         {
-            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach);
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
             if (userId == null)
             {
                 Response.StatusCode = 401;
@@ -195,7 +196,7 @@ namespace ReservationSystemApi.Controllers
             }
 
             ReservationValidationService reservationValidationService = new ReservationValidationService();
-            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequestExists(roomId, requestId);
+            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequest(roomId, requestId, userId.Value);
             if (!requestExistsValidation.Success)
             {
                 Response.StatusCode = 400;
@@ -203,7 +204,63 @@ namespace ReservationSystemApi.Controllers
             }
 
             ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
-            return reservationManipulationService.ChangeReservationApproval(roomId, requestId, ReservationStatus.Rejected);
+            return reservationManipulationService.ChangeReservationApproval(requestId, ReservationStatus.Rejected);
+        }
+
+        [HttpGet("{roomId}/request/list")]
+        public GenericListResponse<ReservationRequestResponse> GetReservationsByDate(long roomId, [FromQuery] DateTime startDate, [FromQuery] DateTime EndDate,
+            [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericListResponse<ReservationRequestResponse>("");
+            }
+
+            RoomValidationService roomValidationService = new RoomValidationService();
+            GenericStatusMessage roomExistsValidation = roomValidationService.ValidateRoomExists(roomId);
+            if (!roomExistsValidation.Success)
+            {
+                Response.StatusCode = 404;
+                return new GenericListResponse<ReservationRequestResponse>("Not found.");
+            }
+
+            ReservationQueryService queryService = new ReservationQueryService();
+            return queryService.GetReservationsByDate(roomId, startDate, EndDate, userId.Value, skip, take);
+        }
+
+        [HttpPost("{roomId}/deactivate")]
+        public GenericStatusMessage DeactivateRoom(long roomId, [FromBody] bool force)
+        {
+            return ChangeRoomActivation(roomId, false, force);
+        }
+
+        [HttpPost("{roomId}/activate")]
+        public GenericStatusMessage ActivateRoom(long roomId)
+        {
+            return ChangeRoomActivation(roomId, true);
+        }
+
+        private GenericStatusMessage ChangeRoomActivation(long roomId, bool activate, bool force = false)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericStatusMessage(false, "");
+            }
+
+            RoomValidationService roomValidationService = new RoomValidationService();
+            GenericStatusMessage roomExistsValidation = roomValidationService.ValidateRoomExistsAndOwnedByUser(roomId, userId.Value);
+            if (!roomExistsValidation.Success)
+            {
+                Response.StatusCode = 404;
+                return new GenericStatusMessage(false, "Not found.");
+            }
+
+            RoomManipulationService roomManipulationService = new RoomManipulationService();
+            return roomManipulationService.ChangeRoomActivation(roomId, activate, force);
         }
     }
 }
