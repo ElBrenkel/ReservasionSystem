@@ -14,11 +14,29 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.divider{
+.divider {
     width: 10px;
     height: 10px;
 }
 
 .flr {
     float: right;
+}
+
+.warn {
+    color: #fd4141;
+}
+
+.stretch {
+    height: 100%;
+    width: 100%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.button-divider {
+    height: 35px;
+    width: 10px;
 }

@@ -1,18 +1,11 @@
 import { APP_ID, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
-import { ErrorStateMatcher } from '@angular/material/core';
 import { Router } from '@angular/router';
+import { MyErrorStateMatcher } from '../common/my-error-state-matcher';
 import { LoginPayload } from '../interfaces/loginPayload';
 import { LoginResponse } from '../interfaces/loginResponse';
 import { ReservationSystemApiService } from '../reservation-system-api.service';
 
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -24,6 +17,7 @@ export class LoginComponent implements OnInit {
   password = "";
   passwordIcon = "visibility";
   passwordInputType = "password";
+  errorMessage = "";
 
   emailFormControl = new FormControl('', [
     Validators.required,
@@ -48,8 +42,16 @@ export class LoginComponent implements OnInit {
       .then((r: LoginResponse) => {
         if (r) {
           localStorage["token"] = r.token;
+          localStorage["user"] = this.username;
           this.router.navigate([""]);
         }
+        else {
+          this.errorMessage = "Wrong username or password.";
+        }
       });
+  }
+
+  onRegisterClicked() {
+    this.router.navigate(["register"]);
   }
 }

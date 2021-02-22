@@ -5,7 +5,8 @@
             <mat-form-field class="full-width">
                 <mat-label>Email</mat-label>
                 <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
-                    placeholder="Ex. name@example.com" [(ngModel)]="username" name="username">
+                    placeholder="Ex. name@example.com" [(ngModel)]="username" name="username"
+                    (click)="errorMessage = ''">
                 <mat-hint></mat-hint>
                 <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
                     Please enter a valid email address
@@ -17,17 +18,21 @@
             <div class="divider"></div>
             <mat-form-field class="full-width">
                 <mat-label>Password</mat-label>
-                <input type="{{passwordInputType}}" matInput [(ngModel)]="password" name="password">
+                <input type="{{passwordInputType}}" matInput [(ngModel)]="password" name="password"
+                    (click)="errorMessage = ''">
                 <button mat-button matSuffix mat-icon-button aria-label="Show password"
                     (mousedown)="togglePasswordVisibility(true)" (mouseup)="togglePasswordVisibility(false)">
                     <mat-icon>{{passwordIcon}}</mat-icon>
                 </button>
             </mat-form-field>
         </form>
+        <div class="warn">
+            {{errorMessage}}
+        </div>
     </mat-card-content>
     <mat-card-actions>
         <button mat-raised-button class="flr" color="primary" (click)="onLoginClicked()">Login</button>
-        <button mat-button color="primary" class="flr">Register</button>
+        <button mat-button color="primary" class="flr" (click)="onRegisterClicked()">Register</button>
         <div class="button-divider"></div>
     </mat-card-actions>
 </mat-card>
