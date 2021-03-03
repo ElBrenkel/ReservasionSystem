@@ -8,6 +8,8 @@ namespace ReservationSystemBusinessLogic.Objects.Api
 {
     public class CreateRoomPayload
     {
+        public string Name { get; set; }
+
         public int? Size { get; set; }
 
         public int? MaxNumberOfPeople { get; set; }

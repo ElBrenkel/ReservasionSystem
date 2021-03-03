@@ -43,13 +43,6 @@ namespace ReservationSystemApi.Controllers
             return response;
         }
 
-        [HttpGet("poke")]
-        public GenericStatusMessage Poke()
-        {
-            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
-            return new GenericStatusMessage(userId != null);
-        }
-
         [HttpPost("logout")]
         public GenericStatusMessage Logout()
         {
@@ -89,6 +82,19 @@ namespace ReservationSystemApi.Controllers
                 return new GenericObjectResponse<UserResponse>($"Could not find user {username}.");
             }
             return new GenericObjectResponse<UserResponse>(response);
+        }
+
+        [HttpGet("ping")]
+        public GenericStatusMessage PingUser()
+        {
+            long? queryingUserId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
+            if (queryingUserId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericStatusMessage(false, $"Unauthorized request.");
+            }
+
+            return new GenericStatusMessage(true);
         }
 
         [HttpPost("changePassword")]

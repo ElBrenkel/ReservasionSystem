@@ -3,6 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MyErrorStateMatcher } from '../common/my-error-state-matcher';
+import { GenericStatusMessage } from '../interfaces/genericStatusMessage';
+import { RegisterPayload } from '../interfaces/registerPayload';
+import { TextInputData } from '../interfaces/textInputData';
+import { DefaultRoles, UserRole } from '../interfaces/userRole';
 import { ReservationSystemApiService } from '../reservation-system-api.service';
 
 @Component({
@@ -12,64 +16,140 @@ import { ReservationSystemApiService } from '../reservation-system-api.service';
 })
 export class RegisterComponent implements OnInit {
 
-  username = "";
-  password = "";
-  passwordIcon = "visibility";
-  passwordInputType = "password";
-  confirmPassword = "";
-  confirmPasswordIcon = "visibility";
-  confirmPasswordInputType = "password";
+  registerPayload: RegisterPayload = {
+    username: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    country: "",
+    city: "",
+    street: "",
+    buildingNumber: 0
+  };
+
+  userRoles: UserRole[] = DefaultRoles.ALL_ROLES;
+  role = 1;
+
+  inputFields: TextInputData[] = [{
+    inputType: "text",
+    label: "Email",
+    prop: "username",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.email,
+      Validators.maxLength(100)
+    ]),
+    placeholder: "name@domain.com"
+  }, {
+    inputType: "password",
+    label: "Password",
+    prop: "password",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(25),
+      Validators.minLength(8)
+    ]),
+    placeholder: ""
+  }, {
+    inputType: "text",
+    label: "First name",
+    prop: "firstName",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(20),
+      Validators.minLength(2)
+    ]),
+    placeholder: "John"
+  }, {
+    inputType: "text",
+    label: "Last name",
+    prop: "lastName",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(20),
+      Validators.minLength(2)
+    ]),
+    placeholder: "Doe"
+  }, {
+    inputType: "text",
+    label: "Country",
+    prop: "country",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(20),
+      Validators.minLength(2)
+    ]),
+    placeholder: "Israel"
+  }, {
+    inputType: "text",
+    label: "City",
+    prop: "city",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(20),
+      Validators.minLength(2)
+    ]),
+    placeholder: "Tel Aviv"
+  }, {
+    inputType: "text",
+    label: "Street",
+    prop: "street",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(50),
+      Validators.minLength(2)
+    ]),
+    placeholder: "Waitzman"
+  }, {
+    inputType: "number",
+    label: "Building number",
+    prop: "buildingNumber",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.min(1)
+    ]),
+    placeholder: ""
+  }
+  ];
+
   errorMessage = "";
 
-  emailFormControl = new FormControl('', [
-    Validators.required,
-    Validators.email,
-    Validators.maxLength(100)
+  userRoleFormControl = new FormControl('', [
+    Validators.required
   ]);
-
-  passwordFormGroup = new FormGroup({
-    password: new FormControl('', [
-      Validators.required
-    ]), confirmPassword: new FormControl('', [
-      Validators.required
-    ])
-  }, { validators: [this.passwordMatchValidator] }
-  );
-
-  passwordMatchValidator(frm: FormGroup) {
-    return frm.controls['password'].value ===
-      frm.controls['confirmPassword'].value ? null : { 'mismatch': true };
-  }
-
-  confirmPasswrodError() {
-    if (this.passwordFormGroup.controls.confirmPassword.hasError('required')) {
-      return "Password confirmation is required";
-    }
-    else if (this.passwordFormGroup.errors?.mismatch) {
-      return "Passwords do not match";
-    }
-    return null;
-  }
 
   matcher = new MyErrorStateMatcher();
 
+  onRegister() {
+    this.registerPayload.confirmPassword = this.registerPayload.password;
+    this.api.register(this.registerPayload, this.role)
+      .then((r: GenericStatusMessage) => {
+        if (r && r.success) {
+          this.router.navigate(["login"]);
+        }
+        else {
+          this.errorMessage = r.message;
+        }
+      });
+  }
 
-  debug() {
-    console.log({ password: this.password, confirmPassword: this.confirmPassword, errors: this.passwordFormGroup.errors });
+  onClear() {
+    this.registerPayload = {
+      username: "",
+      password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+      country: "",
+      city: "",
+      street: "",
+      buildingNumber: 0
+    }
   }
 
   constructor(private api: ReservationSystemApiService, private router: Router) { }
 
   ngOnInit(): void {
-  }
-
-  togglePasswordVisibility(showPassword: boolean): void {
-    this.passwordIcon = showPassword ? "visibility_off" : "visibility";
-    this.passwordInputType = showPassword ? "text" : "password";
-  }
-
-  toggleConfirmPasswordVisibility(showPassword: boolean): void {
-    this.confirmPasswordIcon = showPassword ? "visibility_off" : "visibility";
-    this.confirmPasswordInputType = showPassword ? "text" : "password";
   }
 }

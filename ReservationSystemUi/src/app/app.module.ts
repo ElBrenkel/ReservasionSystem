@@ -10,6 +10,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
+import { TextInputComponent } from './text-input/text-input.component';
+import { TopNavComponent } from './top-nav/top-nav.component';
+import { SearchResultsComponent } from './search-results/search-results.component';
+import { RoomCardComponent } from './room-card/room-card.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +21,10 @@ import { RegisterComponent } from './register/register.component';
     LoginComponent,
     HomeComponent,
     RegisterComponent,
+    TextInputComponent,
+    TopNavComponent,
+    SearchResultsComponent,
+    RoomCardComponent,
   ],
   imports: [
     BrowserModule,

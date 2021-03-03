@@ -18,6 +18,7 @@ namespace ReservationSystemBusinessLogic.Services
             ValidationHelper helper = new ValidationHelper();
             List<GenericStatusMessage> validations = new List<GenericStatusMessage>
             {
+                helper.ValidateStringValue(payload.Name, "Name", 2, 100, required),
                 helper.ValidateValueThanZero(payload.Size, "Size", true, required),
                 helper.ValidateValueThanZero(payload.MaxNumberOfPeople, "Maximum number of people", true, required),
                 helper.ValidateStringValue(payload.Country, "Country", 2, 20, required),

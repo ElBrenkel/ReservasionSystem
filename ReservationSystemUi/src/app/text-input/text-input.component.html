@@ -1,0 +1,13 @@
+<mat-form-field class="full-width">
+    <mat-label>{{label}}</mat-label>
+    <input [type]="currentInputType" matInput [formControl]="control" [errorStateMatcher]="matcher"
+        [placeholder]="placeholder" [(ngModel)]="model[prop]" [name]="label">
+    <button *ngIf="inputType === 'password'" mat-button matSuffix mat-icon-button aria-label="Show password"
+        (mousedown)="togglePasswordVisibility(true)" (mouseup)="togglePasswordVisibility(false)">
+        <mat-icon>{{rightIcon}}</mat-icon>
+    </button>
+    <mat-hint></mat-hint>
+    <mat-error *ngIf="hasErrors() && getFirstError()">
+        {{getFirstError()}}
+    </mat-error>
+</mat-form-field>

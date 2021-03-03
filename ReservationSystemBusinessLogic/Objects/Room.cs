@@ -14,8 +14,11 @@ namespace ReservationSystemBusinessLogic.Objects
 
         public long? OwnerId { get; set; }
 
-        [ForeignKey ("OwnerId")]
+        [ForeignKey("OwnerId")]
         public User Owner { get; set; }
+
+        [StringLength(100)]
+        public string Name { get; set; }
 
         /// <summary>
         /// Calculated by the square metre.
@@ -35,7 +38,7 @@ namespace ReservationSystemBusinessLogic.Objects
 
         public int? BuildingNumber { get; set; }
 
-        [DecimalPrecision(10,6)]
+        [DecimalPrecision(10, 6)]
         public decimal? Lat { get; set; }
 
         [DecimalPrecision(10, 6)]
@@ -46,8 +49,8 @@ namespace ReservationSystemBusinessLogic.Objects
         /// </summary>
         public bool IsActive { get; set; }
 
-        public ICollection <WorkingHours> WorkingHours { get; set; }
+        public ICollection<WorkingHours> WorkingHours { get; set; }
 
-        public ICollection <ReservationRequest> Reservations { get; set; }
+        public ICollection<ReservationRequest> Reservations { get; set; }
     }
 }

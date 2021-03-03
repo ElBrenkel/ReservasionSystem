@@ -1,0 +1,23 @@
+<mat-toolbar>
+    <div class="left">
+        <button mat-icon-button>
+            <mat-icon>person</mat-icon>
+        </button>
+    </div>
+    <div class="center">
+        <mat-form-field class="regular-text">
+            <button mat-button matPrefix mat-icon-button>
+                <mat-icon>search</mat-icon>
+            </button>
+            <input matInput type="text" [ngModel]="value" (ngModelChange)="onSearchChange($event)">
+            <button mat-button *ngIf="value" matSuffix mat-icon-button (click)="value=''">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </mat-form-field>
+    </div>
+    <div class="right">
+        <button mat-icon-button>
+            <mat-icon>logout</mat-icon>
+        </button>
+    </div>
+</mat-toolbar>

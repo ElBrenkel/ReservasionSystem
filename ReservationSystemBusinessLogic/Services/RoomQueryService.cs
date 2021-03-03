@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
 using System.Text;
+using ReservationSystemBusinessLogic.Common;
 using System.Threading.Tasks;
 
 namespace ReservationSystemBusinessLogic.Services
@@ -44,13 +45,15 @@ namespace ReservationSystemBusinessLogic.Services
             return 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
         }
 
-        public GenericListResponse<RoomResponse> GetRoomsByCity(string city, int skip, int take)
+        public GenericListResponse<RoomResponse> GetRoomsByNameOrCity(string city, string name, int skip, int take)
         {
             RoomManipulationService roomManipulationService = new RoomManipulationService();
             using (ReservationDataContext context = new ReservationDataContext())
             {
-                var roomsQuery = context.Rooms.Include(x => x.WorkingHours).Where(x => x.City == city);
-                var rooms = roomsQuery
+                var roomsQuery = context.Rooms.Include(x => x.WorkingHours)
+                    .ToList()
+                    .Where(x => CompareStrings(city, x.City) || CompareStrings(name, x.Name));
+                List<RoomResponse> rooms = roomsQuery
                     .OrderBy(x => x.Id)
                     .Skip(skip)
                     .Take(take)
@@ -63,6 +66,18 @@ namespace ReservationSystemBusinessLogic.Services
             }
         }
 
+        private bool CompareStrings(string a, string b)
+        {
+            if (a == null || b == null)
+            {
+                return false;
+            }
+
+            string lowerA = a.ToLower();
+            string lowerB = b.ToLower();
+            return (lowerA.LevenshteinDistance(lowerB) <= 3 || lowerB.Contains(lowerA));
+        }
+
         public GenericObjectResponse<RoomResponse> GetRoomById(long roomId, bool expand)
         {
             RoomManipulationService roomManipulationService = new RoomManipulationService();
@@ -70,8 +85,8 @@ namespace ReservationSystemBusinessLogic.Services
             {
                 var roomQuery = expand ? context.Rooms.Include(x => x.WorkingHours).Include(x => x.Reservations) : context.Rooms;
                 var room = roomQuery.SingleOrDefault(x => x.Id == roomId);
-                return room != null 
-                    ? new GenericObjectResponse<RoomResponse>(roomManipulationService.ConvertRoomToResponse(room)) 
+                return room != null
+                    ? new GenericObjectResponse<RoomResponse>(roomManipulationService.ConvertRoomToResponse(room))
                     : new GenericObjectResponse<RoomResponse>("Room not found");
             }
         }

@@ -22,6 +22,7 @@ namespace ReservationSystemBusinessLogic.Services
             return new Room
             {
                 OwnerId = userId,
+                Name = payload.Name,
                 Size = payload.Size ?? 0,
                 MaxNumberOfPeople = payload.MaxNumberOfPeople ?? 0,
                 Country = payload.Country,
@@ -38,6 +39,7 @@ namespace ReservationSystemBusinessLogic.Services
             return new RoomResponse
             {
                 Id = room.Id,
+                Name = room.Name,
                 Size = room.Size,
                 MaxNumberOfPeople = room.MaxNumberOfPeople,
                 Country = room.Country,
@@ -114,6 +116,7 @@ namespace ReservationSystemBusinessLogic.Services
                 using (ReservationDataContext context = new ReservationDataContext())
                 {
                     Room room = context.Rooms.Include(x => x.WorkingHours).Single(x => x.Id == roomId);
+                    room.Name = payload.Name ?? room.Name;
                     room.Size = payload.Size ?? room.Size;
                     room.MaxNumberOfPeople = payload.MaxNumberOfPeople ?? room.MaxNumberOfPeople;
                     room.Country = payload.Country ?? room.Country;

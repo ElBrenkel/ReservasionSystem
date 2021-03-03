@@ -122,7 +122,7 @@ namespace ReservationSystemApi.Controllers
         }
 
         [HttpGet("search")]
-        public GenericListResponse<RoomResponse> GetNearbyCity([FromQuery] string city, [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        public GenericListResponse<RoomResponse> GetNearbyCity([FromQuery] string city, [FromQuery] string name, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner, UserRole.Coach);
             if (userId == null)
@@ -132,7 +132,7 @@ namespace ReservationSystemApi.Controllers
             }
 
             RoomQueryService queryService = new RoomQueryService();
-            return queryService.GetRoomsByCity(city, skip, take);
+            return queryService.GetRoomsByNameOrCity(city, name, skip, take);
         }
 
         [HttpPost("{roomId}/request")]
