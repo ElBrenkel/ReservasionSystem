@@ -1,3 +1,6 @@
+import { Reservation } from "./reservation";
+import { WorkingHours } from "./workingHours";
+
 export interface RoomData {
     id: number,
     name: string,
@@ -9,5 +12,8 @@ export interface RoomData {
     buildingNumber: number,
     lat: number,
     lon: number,
-    isActive: boolean
+    isActive: boolean,
+    isOwner: boolean,
+    workingHours: WorkingHours[],
+    reservations: Reservation[]
 }

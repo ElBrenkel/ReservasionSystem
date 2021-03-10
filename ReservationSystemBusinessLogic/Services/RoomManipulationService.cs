@@ -33,7 +33,7 @@ namespace ReservationSystemBusinessLogic.Services
             };
         }
 
-        public RoomResponse ConvertRoomToResponse(Room room)
+        public RoomResponse ConvertRoomToResponse(Room room, long? userId)
         {
             WorkingHoursManipulationService workingHoursManipulationService = new WorkingHoursManipulationService();
             return new RoomResponse
@@ -49,6 +49,7 @@ namespace ReservationSystemBusinessLogic.Services
                 Lat = room.Lat,
                 Lon = room.Lon,
                 IsActive = room.IsActive,
+                IsOwner = userId != null && room.OwnerId == userId,
                 WorkingHours = room.WorkingHours?.Select(workingHoursManipulationService.ConvertWorkingHoursToPayload).ToList()
             };
         }
@@ -71,7 +72,7 @@ namespace ReservationSystemBusinessLogic.Services
                     Room room = ConvertRoomFromPayload(payload, userId);
                     context.Rooms.Add(room);
                     context.SaveChanges();
-                    roomResponse = ConvertRoomToResponse(room);
+                    roomResponse = ConvertRoomToResponse(room, userId);
                 }
 
                 Logger.Debug($"Attempting to create working hours for room {roomResponse.Id}");
@@ -124,7 +125,7 @@ namespace ReservationSystemBusinessLogic.Services
                     room.Street = payload.Street ?? room.Street;
                     room.BuildingNumber = payload.BuildingNumber ?? room.BuildingNumber;
                     context.SaveChanges();
-                    roomResponse = ConvertRoomToResponse(room);
+                    roomResponse = ConvertRoomToResponse(room, room.OwnerId);
                 }
 
                 LatLon latLon = await AddLatLonForRoom(roomResponse.Id);

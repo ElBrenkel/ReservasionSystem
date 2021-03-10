@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AvailableTimes } from './interfaces/availableTimes';
 import { GenericList } from './interfaces/genericListResponse';
+import { GenericObjectResponse } from './interfaces/genericObjectResponse';
 import { GenericStatusMessage } from './interfaces/genericStatusMessage';
 import { LoginPayload } from './interfaces/loginPayload';
 import { LoginResponse } from './interfaces/loginResponse';
@@ -59,6 +61,30 @@ export class ReservationSystemApiService {
       .catch((r) => {
         console.log(r);
         return r.error as GenericList<RoomData>;
+      });
+  }
+
+  public getRoom(roomId: string): Promise<GenericObjectResponse<RoomData>> {
+    return this.http.get(`https://localhost:5001/api/room/${roomId}?expand=true`, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericObjectResponse<RoomData>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericObjectResponse<RoomData>;
+      });
+  }
+
+  public getAvailableTimes(roomId: number, date: Date, duration: number): Promise<GenericList<AvailableTimes>> {
+    return this.http.get(`https://localhost:5001/api/room/${roomId}/availableTimes?startDate=${date.toISOString()}&duration=${duration}`, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericList<AvailableTimes>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericList<AvailableTimes>;
       });
   }
 

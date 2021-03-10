@@ -45,7 +45,7 @@ namespace ReservationSystemBusinessLogic.Services
                     RentEnd = payload.RentEnd,
                     Status = ReservationStatus.Pending,
                     Description = payload.Description,
-                    FinalPrice = CalculatePrice(matchedWorkingHours.PriceForHour, payload.RentStart, payload.RentEnd),
+                    FinalPrice = PriceHelper.CalculatePrice(matchedWorkingHours.PriceForHour, payload.RentStart, payload.RentEnd),
                     RoomId = roomId,
                     UserId = requesterId
 
@@ -55,13 +55,6 @@ namespace ReservationSystemBusinessLogic.Services
 
                 return new GenericObjectResponse<ReservationRequestResponse>(ConvertToResponse(reservationRequest));
             }
-        }
-
-        private decimal CalculatePrice(decimal priceForHour, DateTime rentStart, DateTime rentEnd)
-        {
-            decimal priceForMinute = priceForHour / 60;
-            decimal timeInMinutes = rentEnd.ToMinutes() - rentStart.ToMinutes();
-            return priceForMinute * timeInMinutes;
         }
 
         public GenericStatusMessage ChangeReservationApproval(long requestId, ReservationStatus status)

@@ -12,7 +12,7 @@ namespace ReservationSystemBusinessLogic.Services
 {
     public class RoomQueryService
     {
-        public GenericListResponse<RoomResponse> GetRoomsByLatLonAndRadius(decimal lat, decimal lon, int radius, int skip = 0, int take = 10)
+        public GenericListResponse<RoomResponse> GetRoomsByLatLonAndRadius(long? userId, decimal lat, decimal lon, int radius, int skip = 0, int take = 10)
         {
             RoomManipulationService roomManipulationService = new RoomManipulationService();
             using (ReservationDataContext context = new ReservationDataContext())
@@ -26,7 +26,7 @@ namespace ReservationSystemBusinessLogic.Services
                 List<RoomResponse> rooms = roomsQuery
                     .Skip(skip)
                     .Take(take)
-                    .Select(x => roomManipulationService.ConvertRoomToResponse(x.Room))
+                    .Select(x => roomManipulationService.ConvertRoomToResponse(x.Room, userId))
                     .ToList();
 
                 int count = roomsQuery.Count();
@@ -45,7 +45,7 @@ namespace ReservationSystemBusinessLogic.Services
             return 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
         }
 
-        public GenericListResponse<RoomResponse> GetRoomsByNameOrCity(string city, string name, int skip, int take)
+        public GenericListResponse<RoomResponse> GetRoomsByNameOrCity(long? userId, string city, string name, int skip, int take)
         {
             RoomManipulationService roomManipulationService = new RoomManipulationService();
             using (ReservationDataContext context = new ReservationDataContext())
@@ -58,7 +58,7 @@ namespace ReservationSystemBusinessLogic.Services
                     .Skip(skip)
                     .Take(take)
                     .ToList()
-                    .Select(roomManipulationService.ConvertRoomToResponse)
+                    .Select(x => roomManipulationService.ConvertRoomToResponse(x, userId))
                     .ToList();
 
                 int count = roomsQuery.Count();
@@ -78,7 +78,7 @@ namespace ReservationSystemBusinessLogic.Services
             return (lowerA.LevenshteinDistance(lowerB) <= 3 || lowerB.Contains(lowerA));
         }
 
-        public GenericObjectResponse<RoomResponse> GetRoomById(long roomId, bool expand)
+        public GenericObjectResponse<RoomResponse> GetRoomById(long roomId, long? userId, bool expand)
         {
             RoomManipulationService roomManipulationService = new RoomManipulationService();
             using (ReservationDataContext context = new ReservationDataContext())
@@ -86,8 +86,63 @@ namespace ReservationSystemBusinessLogic.Services
                 var roomQuery = expand ? context.Rooms.Include(x => x.WorkingHours).Include(x => x.Reservations) : context.Rooms;
                 var room = roomQuery.SingleOrDefault(x => x.Id == roomId);
                 return room != null
-                    ? new GenericObjectResponse<RoomResponse>(roomManipulationService.ConvertRoomToResponse(room))
-                    : new GenericObjectResponse<RoomResponse>("Room not found");
+                    ? new GenericObjectResponse<RoomResponse>(roomManipulationService.ConvertRoomToResponse(room, userId))
+                    : new GenericObjectResponse<RoomResponse>("Room not found.");
+            }
+        }
+
+        public GenericListResponse<AvailableReservationTime> GetRoomAvailableTimes(long roomId, DateTime? startDate, int duration, int take)
+        {
+            using (ReservationDataContext context = new ReservationDataContext())
+            {
+                if (duration <= 0)
+                {
+                    return new GenericListResponse<AvailableReservationTime>("Invalid duration.");
+                }
+
+                var roomQuery = context.Rooms.Include(x => x.WorkingHours).Include(x => x.Reservations);
+                var room = roomQuery.SingleOrDefault(x => x.Id == roomId);
+                if (room == null)
+                {
+                    return new GenericListResponse<AvailableReservationTime>("Room not found.");
+                }
+
+                List<AvailableReservationTime> availableTimes = new List<AvailableReservationTime>();
+                DateTime now = DateTime.Now;
+                DateTime currentDate = (startDate != null && startDate > now ? startDate.Value : now).Date;
+                int limit = 1440 - duration;
+                ReservationValidationService reservationValidationService = new ReservationValidationService();
+                while (availableTimes.Count < take)
+                {
+                    for (int i = 0; i < limit && availableTimes.Count < take; i += 30)
+                    {
+                        DateTime rentStart = currentDate + TimeSpan.FromMinutes(i);
+                        if (rentStart < now)
+                        {
+                            continue;
+                        }
+
+                        ReservationRequestPayload payload = new ReservationRequestPayload
+                        {
+                            RentStart = rentStart,
+                            RentEnd = rentStart + TimeSpan.FromMinutes(duration)
+                        };
+
+                        GenericStatusMessage availability = reservationValidationService.ValidateRoomAvailability(context, room, payload);
+                        if (availability.Success)
+                        {
+                            var matchedWorkingHours = reservationValidationService.GetMatchingWorkingHours(payload, room);
+                            availableTimes.Add(new AvailableReservationTime
+                            {
+                                RentStart = rentStart,
+                                Price = PriceHelper.CalculatePrice(matchedWorkingHours.PriceForHour, rentStart, payload.RentEnd)
+                            });
+                        }
+                    }
+
+                    currentDate += TimeSpan.FromDays(1);
+                }
+                return new GenericListResponse<AvailableReservationTime>(availableTimes, availableTimes.Count);
             }
         }
     }

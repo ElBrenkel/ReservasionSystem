@@ -6,10 +6,11 @@
     </div>
     <div class="center">
         <mat-form-field class="regular-text">
-            <button mat-button matPrefix mat-icon-button>
+            <button mat-button matPrefix mat-icon-button (click)="onSearchClicked()">
                 <mat-icon>search</mat-icon>
             </button>
-            <input matInput type="text" [ngModel]="value" (ngModelChange)="onSearchChange($event)">
+            <input matInput type="text" [ngModel]="value" (ngModelChange)="onSearchChange($event)"
+                (keyDown.enter)="onSearchClicked()">
             <button mat-button *ngIf="value" matSuffix mat-icon-button (click)="value=''">
                 <mat-icon>clear</mat-icon>
             </button>

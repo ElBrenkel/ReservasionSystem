@@ -14,6 +14,11 @@ import { TextInputComponent } from './text-input/text-input.component';
 import { TopNavComponent } from './top-nav/top-nav.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
 import { RoomCardComponent } from './room-card/room-card.component';
+import { RoomViewComponent } from './room-view/room-view.component';
+import { RoomViewHeaderComponent } from './room-view-header/room-view-header.component';
+import { RoomViewWorkingHoursComponent } from './room-view-working-hours/room-view-working-hours.component';
+import { RoomEditWorkingHoursComponent } from './room-edit-working-hours/room-edit-working-hours.component';
+import { RoomAddReservationComponent } from './room-add-reservation/room-add-reservation.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +30,11 @@ import { RoomCardComponent } from './room-card/room-card.component';
     TopNavComponent,
     SearchResultsComponent,
     RoomCardComponent,
+    RoomViewComponent,
+    RoomViewHeaderComponent,
+    RoomViewWorkingHoursComponent,
+    RoomEditWorkingHoursComponent,
+    RoomAddReservationComponent,
   ],
   imports: [
     BrowserModule,

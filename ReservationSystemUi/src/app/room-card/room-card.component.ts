@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Utils } from '../common/utils';
 
 @Component({
   selector: 'app-room-card',
@@ -6,18 +8,24 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./room-card.component.scss']
 })
 export class RoomCardComponent implements OnInit {
+  @Input() roomId: number;
   @Input() roomName = "";
   @Input() roomAddress = "";
   @Input() isActive = true;
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
   }
 
   calcPicNumber(): number {
     const seed = `${this.roomName}${this.roomAddress}`;
-    const number = seed.split("").map(x => x.charCodeAt(0)).reduce((x, y) => x + y);
-    return (number % 6) + 1;
+    return Utils.calcPicNumber(seed);
+  }
+
+  onCardClick(): void {
+    if (this.isActive && this.roomId) {
+      this.router.navigate([`room/${this.roomId}`]);
+    }
   }
 }

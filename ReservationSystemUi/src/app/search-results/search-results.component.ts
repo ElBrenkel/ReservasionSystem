@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { utils } from 'protractor';
+import { Utils } from '../common/utils';
 import { RoomData } from '../interfaces/roomData';
 
 @Component({
@@ -15,6 +17,6 @@ export class SearchResultsComponent implements OnInit {
   }
 
   roomAddress(room: RoomData): string {
-    return `${room.street} ${room.buildingNumber} ${room.city}`;
+    return Utils.roomAddress(room);
   }
 }

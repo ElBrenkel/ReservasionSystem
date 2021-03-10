@@ -1,4 +1,6 @@
 <div class="page-width">
     <app-top-nav (searchValueChangedEvent)="searchByCityOrName($event)"></app-top-nav>
-    <app-search-results [rooms]="rooms"></app-search-results>
+    <div class="full-width mt10">
+        <app-search-results [rooms]="rooms"></app-search-results>
+    </div>
 </div>

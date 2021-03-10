@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MyErrorStateMatcher } from '../common/my-error-state-matcher';
 import { LoginPayload } from '../interfaces/loginPayload';
 import { LoginResponse } from '../interfaces/loginResponse';
+import { TextInputData } from '../interfaces/textInputData';
 import { ReservationSystemApiService } from '../reservation-system-api.service';
 
 @Component({
@@ -13,16 +14,34 @@ import { ReservationSystemApiService } from '../reservation-system-api.service';
 })
 export class LoginComponent implements OnInit {
 
-  username = "";
-  password = "";
-  passwordIcon = "visibility";
-  passwordInputType = "password";
+  payload: LoginPayload = {
+    username: "",
+    password: ""
+  };
+
   errorMessage = "";
 
-  emailFormControl = new FormControl('', [
-    Validators.required,
-    Validators.email,
-  ]);
+  inputFields: TextInputData[] = [{
+    inputType: "text",
+    label: "Email",
+    prop: "username",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.email,
+      Validators.maxLength(100)
+    ]),
+    placeholder: "name@domain.com"
+  }, {
+    inputType: "password",
+    label: "Password",
+    prop: "password",
+    control: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(25),
+      Validators.minLength(8)
+    ]),
+    placeholder: ""
+  }];
 
   matcher = new MyErrorStateMatcher();
 
@@ -31,18 +50,12 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  togglePasswordVisibility(showPassword: boolean): void {
-    this.passwordIcon = showPassword ? "visibility_off" : "visibility";
-    this.passwordInputType = showPassword ? "text" : "password";
-  }
-
   onLoginClicked() {
-    const payload: LoginPayload = { username: this.username, password: this.password };
-    this.api.login(payload)
+    this.api.login(this.payload)
       .then((r: LoginResponse) => {
         if (r) {
           localStorage["token"] = r.token;
-          localStorage["user"] = this.username;
+          localStorage["user"] = this.payload.username;
           this.router.navigate([""]);
         }
         else {

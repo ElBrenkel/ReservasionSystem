@@ -4,6 +4,7 @@ import { AuthenticationGuard } from './guards/authentication.guard';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { RoomViewComponent } from './room-view/room-view.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,10 @@ const routes: Routes = [
   }, {
     path: "",
     component: HomeComponent,
+    canActivate: [AuthenticationGuard]
+  }, {
+    path: "room/:id",
+    component: RoomViewComponent,
     canActivate: [AuthenticationGuard]
   },
   {

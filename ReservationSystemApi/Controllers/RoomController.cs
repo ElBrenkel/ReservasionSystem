@@ -97,13 +97,33 @@ namespace ReservationSystemApi.Controllers
             }
 
             RoomQueryService queryService = new RoomQueryService();
-            var room = queryService.GetRoomById(roomId, expand);
+            var room = queryService.GetRoomById(roomId, userId, expand);
             if (!room.Status.Success)
             {
                 Response.StatusCode = 404;
             }
 
             return room;
+        }
+
+        [HttpGet("{roomId}/availableTimes")]
+        public GenericListResponse<AvailableReservationTime> GetRoomAvailableTimes(long roomId, [FromQuery] DateTime? startDate, [FromQuery] int duration, int take = 10)
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner, UserRole.Coach);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericListResponse<AvailableReservationTime>("");
+            }
+
+            RoomQueryService queryService = new RoomQueryService();
+            var availableTimes = queryService.GetRoomAvailableTimes(roomId, startDate, duration, take);
+            if (!availableTimes.Status.Success)
+            {
+                Response.StatusCode = 404;
+            }
+
+            return availableTimes;
         }
 
         [HttpGet("nearby")]
@@ -118,7 +138,7 @@ namespace ReservationSystemApi.Controllers
             }
 
             RoomQueryService queryService = new RoomQueryService();
-            return queryService.GetRoomsByLatLonAndRadius(lat, lon, radius, skip, take);
+            return queryService.GetRoomsByLatLonAndRadius(userId, lat, lon, radius, skip, take);
         }
 
         [HttpGet("search")]
@@ -132,7 +152,7 @@ namespace ReservationSystemApi.Controllers
             }
 
             RoomQueryService queryService = new RoomQueryService();
-            return queryService.GetRoomsByNameOrCity(city, name, skip, take);
+            return queryService.GetRoomsByNameOrCity(userId, city, name, skip, take);
         }
 
         [HttpPost("{roomId}/request")]
@@ -152,7 +172,7 @@ namespace ReservationSystemApi.Controllers
                 RentEnd = payload.RentEnd.TrimDate(DateTimePrecision.Minute)
             };
             ReservationValidationService reservationValidationService = new ReservationValidationService();
-            GenericStatusMessage roomAvailabilityValidation = reservationValidationService.ValidateRoomAvailability(roomId, userId.Value, trimmedPayload);
+            GenericStatusMessage roomAvailabilityValidation = reservationValidationService.ValidateRoomAvailability(roomId, trimmedPayload);
             if (!roomAvailabilityValidation.Success)
             {
                 Response.StatusCode = 400;

@@ -14,43 +14,48 @@ namespace ReservationSystemBusinessLogic.Services
 {
     public class ReservationValidationService
     {
-        public GenericStatusMessage ValidateRoomAvailability(long roomId, long userId, ReservationRequestPayload payload)
+        public GenericStatusMessage ValidateRoomAvailability(long roomId, ReservationRequestPayload payload)
         {
             using (ReservationDataContext context = new ReservationDataContext())
             {
                 Room room = context.Rooms.Include(x => x.WorkingHours).SingleOrDefault(x => x.Id == roomId && x.IsActive);
-                if (room == null)
-                {
-                    return new GenericStatusMessage(false, "Room not found or is not currently active.");
-                }
-
-                if (payload.RentStart.Date != payload.RentEnd.Date)
-                {
-                    return new GenericStatusMessage(false, "Rent start and rent end should be on the same day.");
-                }
-
-                if (payload.RentStart >= payload.RentEnd)
-                {
-                    return new GenericStatusMessage(false, "Rent start can't be after rent end.");
-                }
-
-                if (GetMatchingWorkingHours(payload, room) == null)
-                {
-                    return new GenericStatusMessage(false, "Reservation is not in the rooms working hours.");
-                }
-
-                bool collision = context.ReservationRequests.Any(x => x.RoomId == roomId
-                    && x.Status == ReservationStatus.Approved
-                    && DbFunctions.TruncateTime(x.RentStart) == DbFunctions.TruncateTime(payload.RentStart)
-                    && ((x.RentStart >= payload.RentStart && x.RentEnd <= payload.RentStart)
-                        || (x.RentStart >= payload.RentEnd && x.RentEnd <= payload.RentEnd)));
-                if (collision)
-                {
-                    return new GenericStatusMessage(false, "Reservation collides with an already approved reservation.");
-                }
-
-                return new GenericStatusMessage(true);
+                return ValidateRoomAvailability(context, room, payload);
             }
+        }
+
+        public GenericStatusMessage ValidateRoomAvailability(ReservationDataContext context, Room room, ReservationRequestPayload payload)
+        {
+            if (room == null)
+            {
+                return new GenericStatusMessage(false, "Room not found or is not currently active.");
+            }
+
+            if (payload.RentStart.Date != payload.RentEnd.Date)
+            {
+                return new GenericStatusMessage(false, "Rent start and rent end should be on the same day.");
+            }
+
+            if (payload.RentStart >= payload.RentEnd)
+            {
+                return new GenericStatusMessage(false, "Rent start can't be after rent end.");
+            }
+
+            if (GetMatchingWorkingHours(payload, room) == null)
+            {
+                return new GenericStatusMessage(false, "Reservation is not in the rooms working hours.");
+            }
+
+            bool collision = context.ReservationRequests.Any(x => x.RoomId == room.Id
+                && x.Status == ReservationStatus.Approved
+                && DbFunctions.TruncateTime(x.RentStart) == DbFunctions.TruncateTime(payload.RentStart)
+                && ((x.RentStart >= payload.RentStart && x.RentEnd <= payload.RentStart)
+                    || (x.RentStart >= payload.RentEnd && x.RentEnd <= payload.RentEnd)));
+            if (collision)
+            {
+                return new GenericStatusMessage(false, "Reservation collides with an already approved reservation.");
+            }
+
+            return new GenericStatusMessage(true);
         }
 
         public WorkingHours GetMatchingWorkingHours(ReservationRequestPayload payload, Room room)

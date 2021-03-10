@@ -1,0 +1,12 @@
+<div class="header full-width">
+    <img class="stretch round-border" src="../../assets/gymPics/{{calcPicNumber()}}.jpg">
+    <div class="container full-width">
+        <div class="roomName ml10">{{roomData.name}}</div>
+        <div class="roomAddress ml10">{{roomAddress()}}</div>
+        <div *ngIf="roomData.lat && roomData.lon" class="mapButton">
+            <a [href]="getlocationLink()">
+                <mat-icon>location_on</mat-icon>
+            </a>
+        </div>
+    </div>
+</div>

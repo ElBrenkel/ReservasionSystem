@@ -53,3 +53,16 @@ body {
 .ml10 {
     margin-left: 10px;
 }
+
+.mt10 {
+    margin-top: 10px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.mat-grid-tile .mat-figure {
+    justify-content: flex-start !important ;
+    align-items: flex-start !important;
+}

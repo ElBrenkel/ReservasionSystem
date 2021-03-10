@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ReservationSystemBusinessLogic.Objects.Api
 {
-    public class RoomResponse : CreateRoomPayload
+    public class AvailableReservationTime
     {
-        public long Id { get; set; }
+        public DateTime RentStart { get; set; }
 
-        public bool IsOwner { get; set; }
+        public decimal Price { get; set; }
     }
 }

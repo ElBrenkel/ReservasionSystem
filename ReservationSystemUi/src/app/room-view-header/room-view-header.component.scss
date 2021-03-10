@@ -1,0 +1,37 @@
+img {
+    object-fit: cover;
+}
+
+.header {
+    height: 250px;
+}
+
+.container {
+    position: relative;
+    height: 95px;
+    top: -99px;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+}
+
+.roomName {
+    font-size: 3rem;
+    font-weight: 400;
+}
+
+.roomAddress {
+    font-size: 1.5rem;
+}
+
+.mapButton {
+    position: absolute;
+    right: 5px;
+    bottom: 3px;
+}
+
+.mapButton a {
+    color: white;
+}
+
+.mapButton a:visited {
+    color: white;
+}
