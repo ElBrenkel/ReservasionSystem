@@ -1,12 +1,35 @@
 <div class="header full-width">
     <img class="stretch round-border" src="../../assets/gymPics/{{calcPicNumber()}}.jpg">
     <div class="container full-width">
-        <div class="roomName ml10">{{roomData.name}}</div>
-        <div class="roomAddress ml10">{{roomAddress()}}</div>
-        <div *ngIf="roomData.lat && roomData.lon" class="mapButton">
-            <a [href]="getlocationLink()">
+        <div class="ml10">
+            <span *ngIf="!isEditMode" class="roomName">
+                {{roomData.name}}
+            </span>
+            <div *ngIf="isEditMode" class="editName">
+                <app-text-input [inputType]="roomNameInput.inputType" [label]="roomNameInput.label" [model]="roomData"
+                    [prop]="roomNameInput.prop" [control]="roomNameInput.control"
+                    [placeholder]="roomNameInput.placeholder" [fullWidth]="false">
+                </app-text-input>
+            </div>
+        </div>
+        <div class="ml10">
+            <span *ngIf="!isEditMode" class="roomAddress">
+                {{roomAddress()}}
+            </span>
+            <div *ngIf="isEditMode" class="editAddress">
+                <app-text-input *ngFor="let field of addressInputs" class="mr10" [inputType]="field.inputType"
+                    [label]="field.label" [model]="roomData" [prop]="field.prop" [control]="field.control"
+                    [placeholder]="field.placeholder" [fullWidth]="false">
+                </app-text-input>
+            </div>
+        </div>
+        <div class="mapButton">
+            <button mat-icon-button *ngIf="roomData.lat && roomData.lon" (click)="onLocationClick()">
                 <mat-icon>location_on</mat-icon>
-            </a>
+            </button>
+            <button mat-icon-button *ngIf="roomData.isOwner" (click)="onEditClick()">
+                <mat-icon>{{editIcon}}</mat-icon>
+            </button>
         </div>
     </div>
 </div>

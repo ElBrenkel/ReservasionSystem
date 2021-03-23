@@ -12,7 +12,7 @@ namespace ReservationSystemBusinessLogic.Common
         {
             decimal priceForMinute = priceForHour / 60;
             decimal timeInMinutes = rentEnd.ToMinutes() - rentStart.ToMinutes();
-            return priceForMinute * timeInMinutes;
+            return Math.Round(priceForMinute * timeInMinutes, 2);
         }
     }
 }

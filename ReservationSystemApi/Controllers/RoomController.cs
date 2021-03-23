@@ -168,8 +168,8 @@ namespace ReservationSystemApi.Controllers
             ReservationRequestPayload trimmedPayload = new ReservationRequestPayload()
             {
                 Description = payload.Description,
-                RentStart = payload.RentStart.TrimDate(DateTimePrecision.Minute),
-                RentEnd = payload.RentEnd.TrimDate(DateTimePrecision.Minute)
+                RentStart = payload.RentStart.TrimDate(DateTimePrecision.Minute).ToLocalDate(),
+                RentEnd = payload.RentEnd.TrimDate(DateTimePrecision.Minute).ToLocalDate()
             };
             ReservationValidationService reservationValidationService = new ReservationValidationService();
             GenericStatusMessage roomAvailabilityValidation = reservationValidationService.ValidateRoomAvailability(roomId, trimmedPayload);

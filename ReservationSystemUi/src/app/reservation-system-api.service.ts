@@ -7,6 +7,7 @@ import { GenericStatusMessage } from './interfaces/genericStatusMessage';
 import { LoginPayload } from './interfaces/loginPayload';
 import { LoginResponse } from './interfaces/loginResponse';
 import { RegisterPayload } from './interfaces/registerPayload';
+import { Reservation } from './interfaces/reservation';
 import { RoomData } from './interfaces/roomData';
 
 @Injectable({
@@ -77,6 +78,7 @@ export class ReservationSystemApiService {
   }
 
   public getAvailableTimes(roomId: number, date: Date, duration: number): Promise<GenericList<AvailableTimes>> {
+    console.log({ date });
     return this.http.get(`https://localhost:5001/api/room/${roomId}/availableTimes?startDate=${date.toISOString()}&duration=${duration}`, { headers: this.getHeaders() })
       .toPromise()
       .then((r) => {
@@ -85,6 +87,30 @@ export class ReservationSystemApiService {
       .catch((r) => {
         console.log(r);
         return r.error as GenericList<AvailableTimes>;
+      });
+  }
+
+  public requestReservation(roomId: number, reservation: Reservation): Promise<GenericObjectResponse<Reservation>> {
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/request`, reservation, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericObjectResponse<Reservation>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericObjectResponse<Reservation>;
+      });
+  }
+
+  public editRoomData(roomData: RoomData): Promise<GenericObjectResponse<RoomData>> {
+    return this.http.patch(`https://localhost:5001/api/room/${roomData.id}`, roomData, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericObjectResponse<RoomData>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericObjectResponse<RoomData>;
       });
   }
 

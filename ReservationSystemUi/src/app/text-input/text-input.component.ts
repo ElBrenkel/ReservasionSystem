@@ -15,6 +15,7 @@ export class TextInputComponent implements OnInit {
   @Input() prop = "";
   @Input() control: FormControl;
   @Input() placeholder = "";
+  @Input() fullWidth = true;
 
   currentInputType = "";
   matcher = new MyErrorStateMatcher();

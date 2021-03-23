@@ -1,9 +1,9 @@
 export interface Reservation {
-    userId: number,
-    roomId: number,
+    userId?: number,
+    roomId?: number,
     rentStart: string,
     rentEnd: string,
-    finalPrice: number,
+    finalPrice?: number,
     description: string,
-    status: string
+    status?: string
 }

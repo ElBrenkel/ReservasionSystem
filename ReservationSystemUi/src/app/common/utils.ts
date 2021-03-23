@@ -29,4 +29,14 @@ export class Utils {
         const minutes = `${time % 60}`.padStart(2, "0");
         return `${hours}:${minutes}`;
     }
+
+    public static getHourFromDate(time: Date): string {
+        const hours = time.getHours();
+        const minutes = time.getMinutes();
+        return this.getHour(hours * 60 + minutes);
+    }
+
+    public static addMinutes(date: Date, minutes: number): Date {
+        return new Date(date.getTime() + minutes * 60000);
+    }
 }

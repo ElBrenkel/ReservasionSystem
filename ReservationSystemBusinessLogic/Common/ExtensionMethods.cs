@@ -86,6 +86,11 @@ namespace ReservationSystemBusinessLogic.Common
             }
         }
 
+        public static DateTime ToLocalDate(this DateTime date)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(date, TimeZoneInfo.Local);
+        }
+
         public static int LevenshteinDistance(this string a, string b)
         {
             if (String.IsNullOrEmpty(a) && String.IsNullOrEmpty(b))

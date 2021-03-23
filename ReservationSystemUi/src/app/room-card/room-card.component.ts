@@ -19,7 +19,7 @@ export class RoomCardComponent implements OnInit {
   }
 
   calcPicNumber(): number {
-    const seed = `${this.roomName}${this.roomAddress}`;
+    const seed = `${this.roomId}`;
     return Utils.calcPicNumber(seed);
   }
 

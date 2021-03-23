@@ -19,6 +19,7 @@ import { RoomViewHeaderComponent } from './room-view-header/room-view-header.com
 import { RoomViewWorkingHoursComponent } from './room-view-working-hours/room-view-working-hours.component';
 import { RoomEditWorkingHoursComponent } from './room-edit-working-hours/room-edit-working-hours.component';
 import { RoomAddReservationComponent } from './room-add-reservation/room-add-reservation.component';
+import { ReservationStatusSnackbarComponent } from './reservation-status-snackbar/reservation-status-snackbar.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { RoomAddReservationComponent } from './room-add-reservation/room-add-res
     RoomViewWorkingHoursComponent,
     RoomEditWorkingHoursComponent,
     RoomAddReservationComponent,
+    ReservationStatusSnackbarComponent,
   ],
   imports: [
     BrowserModule,

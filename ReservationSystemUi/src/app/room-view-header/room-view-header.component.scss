@@ -18,8 +18,20 @@ img {
     font-weight: 400;
 }
 
+.editName {
+    font-size: 1.5rem;
+    position: relative;
+    top: -22px;
+}
+
 .roomAddress {
     font-size: 1.5rem;
+}
+
+.editAddress {
+    font-size: 1rem;
+    position: relative;
+    top: -58px;
 }
 
 .mapButton {

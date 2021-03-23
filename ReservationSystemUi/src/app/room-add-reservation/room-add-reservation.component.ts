@@ -1,8 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DateAdapter } from '@angular/material/core';
-import { promise } from 'selenium-webdriver';
+import { FormControl } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Utils } from '../common/utils';
+import { AvailableTimes } from '../interfaces/availableTimes';
 import { RoomData } from '../interfaces/roomData';
+import { ReservationStatusSnackbarComponent } from '../reservation-status-snackbar/reservation-status-snackbar.component';
 import { ReservationSystemApiService } from '../reservation-system-api.service';
 
 @Component({
@@ -16,6 +18,8 @@ export class RoomAddReservationComponent implements OnInit {
   slots = [];
   date: Date | null;
   duration: number = 0;
+  selectedSlot: AvailableTimes;
+  dateFormControl = new FormControl(new Date());
 
   workingHoursFilter = (d: Date | null): boolean => {
     const workingHoursDays = this.roomData.workingHours.map(x => x.day);
@@ -23,7 +27,7 @@ export class RoomAddReservationComponent implements OnInit {
     return workingHoursDays.includes(day);
   }
 
-  constructor(private api: ReservationSystemApiService) { }
+  constructor(private api: ReservationSystemApiService, public snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.populateTimes();
@@ -53,6 +57,7 @@ export class RoomAddReservationComponent implements OnInit {
           viewValue: `${(new Date(x.rentStart)).toString()} - ${x.price} ₪`
         };
       });
+      this.selectedSlot = this.slots[0].value;
     }
   }
 
@@ -64,5 +69,41 @@ export class RoomAddReservationComponent implements OnInit {
         viewValue: Utils.getHour(i)
       });
     }
+  }
+
+  getFinalReservation(): string {
+    const rentStart = new Date(this.selectedSlot.rentStart);
+    const rentEnd = Utils.addMinutes(rentStart, this.duration);
+    const date = rentStart.toDateString();
+    const timeStart = Utils.getHourFromDate(rentStart);
+    const timeEnd = Utils.getHourFromDate(rentEnd);
+    const totalPrice = `${this.selectedSlot.price} ₪`;
+    return `Reservation set for ${date} from ${timeStart} to ${timeEnd} for a total price of: ${totalPrice}`;
+  }
+
+  async onSubmit(): Promise<void> {
+    const rentStart = new Date(this.selectedSlot.rentStart);
+    const rentEnd = Utils.addMinutes(rentStart, this.duration);
+    const reservation = {
+      rentStart: rentStart.toISOString(),
+      rentEnd: rentEnd.toISOString(),
+      description: ""
+    };
+    const reservationStatus = await this.api.requestReservation(this.roomData.id, reservation);
+    if (reservationStatus.status.success) {
+      this.duration = 0;
+      this.date = null;
+      this.selectedSlot = null;
+      this.slots = [];
+      this.dateFormControl.setValue(new Date());
+    }
+    this.openSnackbar(reservationStatus.status.success, reservationStatus.status.message);
+  }
+
+  openSnackbar(success: boolean, message: string): void {
+    const data = { success, message };
+    const panelClass = success ? ['mat-toolbar', 'mat-primary'] : ['mat-toolbar', 'mat-warn'];
+    const duration = 5000;
+    this.snackBar.openFromComponent(ReservationStatusSnackbarComponent, { data, panelClass, duration });
   }
 }
