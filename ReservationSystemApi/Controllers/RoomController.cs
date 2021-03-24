@@ -194,7 +194,7 @@ namespace ReservationSystemApi.Controllers
             }
 
             ReservationValidationService reservationValidationService = new ReservationValidationService();
-            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequest(roomId, requestId, userId.Value);
+            GenericStatusMessage requestExistsValidation = reservationValidationService.ValidateRequest(roomId, requestId, userId.Value, true);
             if (!requestExistsValidation.Success)
             {
                 Response.StatusCode = 400;

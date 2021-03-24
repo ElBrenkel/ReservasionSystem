@@ -1,5 +1,5 @@
 <div class="stretch card-container pointer" (click)="onCardClick()">
-    <div *ngIf="!isActive" class="overlay">
+    <div *ngIf="!isActive" class="overlay" [class.not-allowed]="!isOwner">
         <div class="center">
             Closed
         </div>

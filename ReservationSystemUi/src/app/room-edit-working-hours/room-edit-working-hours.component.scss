@@ -1,0 +1,26 @@
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-right: 2px;
+}
+
+.button-row {
+    display: table-cell;
+    width: 100%;
+}
+
+.day-enabled {
+    background-color: #9c27b0;
+    color: whitesmoke;
+}
+
+.day-disabled {
+    background-color: hsla(0, 0%, 100%, 0.12);
+    color: hsla(0, 0%, 100%, 0.3);
+}

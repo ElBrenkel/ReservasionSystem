@@ -20,6 +20,7 @@ import { RoomViewWorkingHoursComponent } from './room-view-working-hours/room-vi
 import { RoomEditWorkingHoursComponent } from './room-edit-working-hours/room-edit-working-hours.component';
 import { RoomAddReservationComponent } from './room-add-reservation/room-add-reservation.component';
 import { ReservationStatusSnackbarComponent } from './reservation-status-snackbar/reservation-status-snackbar.component';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { ReservationStatusSnackbarComponent } from './reservation-status-snackba
     RoomEditWorkingHoursComponent,
     RoomAddReservationComponent,
     ReservationStatusSnackbarComponent,
+    ConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,

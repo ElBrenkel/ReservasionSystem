@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AvailableTimes } from './interfaces/availableTimes';
+import { ChangePassword } from './interfaces/changePassword';
 import { GenericList } from './interfaces/genericListResponse';
 import { GenericObjectResponse } from './interfaces/genericObjectResponse';
 import { GenericStatusMessage } from './interfaces/genericStatusMessage';
@@ -9,6 +10,7 @@ import { LoginResponse } from './interfaces/loginResponse';
 import { RegisterPayload } from './interfaces/registerPayload';
 import { Reservation } from './interfaces/reservation';
 import { RoomData } from './interfaces/roomData';
+import { User } from './interfaces/user';
 
 @Injectable({
   providedIn: 'root'
@@ -111,6 +113,102 @@ export class ReservationSystemApiService {
       .catch((r) => {
         console.log(r);
         return r.error as GenericObjectResponse<RoomData>;
+      });
+  }
+
+  public acceptReservation(roomId: number, requestId: number): Promise<GenericStatusMessage> {
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/request/${requestId}`, null, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericStatusMessage;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericStatusMessage;
+      });
+  }
+
+  public rejectReservation(roomId: number, requestId: number): Promise<GenericStatusMessage> {
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/request/${requestId}`, null, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericStatusMessage;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericStatusMessage;
+      });
+  }
+
+  public deactivateRoom(roomId: number, force: boolean): Promise<GenericStatusMessage> {
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/deactivate`, force, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericStatusMessage;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericStatusMessage;
+      });
+  }
+
+  public activateRoom(roomId: number): Promise<GenericStatusMessage> {
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/activate`, null, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericStatusMessage;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericStatusMessage;
+      });
+  }
+
+  public logout(): Promise<GenericStatusMessage> {
+    return this.http.post(`https://localhost:5001/api/user/logout`, null, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericStatusMessage;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericStatusMessage;
+      });
+  }
+
+  public getUserData(): Promise<GenericObjectResponse<User>> {
+    return this.http.get(`https://localhost:5001/api/user`, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericObjectResponse<User>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericObjectResponse<User>;
+      });
+  }
+
+  public changeUserData(user: User): Promise<GenericObjectResponse<User>> {
+    return this.http.patch(`https://localhost:5001/api/user`, user, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericObjectResponse<User>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericObjectResponse<User>;
+      });
+  }
+
+  public changePassword(payload: ChangePassword): Promise<GenericStatusMessage> {
+    return this.http.post(`https://localhost:5001/api/user/changePassword`, payload, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericStatusMessage;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericStatusMessage;
       });
   }
 

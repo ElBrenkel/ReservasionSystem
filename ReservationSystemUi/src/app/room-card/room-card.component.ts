@@ -12,6 +12,7 @@ export class RoomCardComponent implements OnInit {
   @Input() roomName = "";
   @Input() roomAddress = "";
   @Input() isActive = true;
+  @Input() isOwner = false;
 
   constructor(private router: Router) { }
 
@@ -24,7 +25,7 @@ export class RoomCardComponent implements OnInit {
   }
 
   onCardClick(): void {
-    if (this.isActive && this.roomId) {
+    if ((this.isActive || this.isOwner) && this.roomId) {
       this.router.navigate([`room/${this.roomId}`]);
     }
   }

@@ -1,1 +1,21 @@
-<p>room-edit-working-hours works!</p>
+<div class="full-width">
+    <div class="header">Edit active hours</div>
+    <div class="button-row">
+        <div class="flex-container">
+            <div *ngFor="let dayObj of days" class="button-container">
+                <button mat-mini-fab [class.day-enabled]="dayObj.active" [class.day-disabled]="!dayObj.active"
+                    aria-label="Example icon button with a menu icon" (click)="onDayClicked(dayObj)">
+                    {{dayObj.char}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div *ngFor="let day of activeDays" class="container full-width">
+        <div class="day">{{getDayString(day)}}</div>
+        <div class="time">
+            <div *ngFor="let hours of sortedWorkingHours[day]">
+                {{getHour(hours.timeStart)}} - {{getHour(hours.timeEnd)}}
+            </div>
+        </div>
+    </div>
+</div>

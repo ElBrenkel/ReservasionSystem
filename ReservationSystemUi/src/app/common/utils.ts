@@ -1,7 +1,7 @@
 import { RoomData } from "../interfaces/roomData";
 
 export class Utils {
-    private static dayStrings = {
+    public static dayStrings = {
         1: "Sunday",
         2: "Monday",
         3: "Tuesday",

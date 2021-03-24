@@ -23,6 +23,19 @@ namespace ReservationSystemBusinessLogic.Services
             }
         }
 
+        private GenericStatusMessage ValidateRoomAvailability(ReservationDataContext context, ReservationRequest request)
+        {
+            Room room = context.Rooms.SingleOrDefault(x => x.Id == request.RoomId);
+            ReservationRequestPayload payload = new ReservationRequestPayload
+            {
+                RentStart = request.RentStart,
+                RentEnd = request.RentEnd,
+                Description = request.Description
+            };
+
+            return ValidateRoomAvailability(context, room, payload);
+        }
+
         public GenericStatusMessage ValidateRoomAvailability(ReservationDataContext context, Room room, ReservationRequestPayload payload)
         {
             if (room == null)
@@ -66,7 +79,7 @@ namespace ReservationSystemBusinessLogic.Services
             return room.WorkingHours.FirstOrDefault(x => x.Day == reservationDay && x.TimeStart <= reservationStartTime && x.TimeEnd >= resevationEndTime);
         }
 
-        public GenericStatusMessage ValidateRequest(long roomId, long requestId, long userId)
+        public GenericStatusMessage ValidateRequest(long roomId, long requestId, long userId, bool validateDoubleBooking = false)
         {
             using (ReservationDataContext context = new ReservationDataContext())
             {
@@ -84,6 +97,11 @@ namespace ReservationSystemBusinessLogic.Services
                 if (reservationRequest.Room.OwnerId != userId)
                 {
                     return new GenericStatusMessage(false, $"Request {requestId} can not be verified by user.");
+                }
+
+                if (validateDoubleBooking)
+                {
+                    return ValidateRoomAvailability(context, reservationRequest);
                 }
 
                 return new GenericStatusMessage(true);

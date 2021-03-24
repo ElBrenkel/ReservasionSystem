@@ -109,8 +109,8 @@ namespace ReservationSystemBusinessLogic.Services
 
                 List<AvailableReservationTime> availableTimes = new List<AvailableReservationTime>();
                 DateTime now = DateTime.Now;
-                DateTime currentDateTemp = (startDate != null && startDate > now ? startDate.Value : now);
-                DateTime currentDate = currentDateTemp.ToLocalDate().Date;
+                DateTime currentDateTemp = (startDate != null && startDate > now ? startDate.Value.ToLocalDate() : now);
+                DateTime currentDate = currentDateTemp.Date;
                 int limit = 1440 - duration;
                 ReservationValidationService reservationValidationService = new ReservationValidationService();
                 while (availableTimes.Count < take)

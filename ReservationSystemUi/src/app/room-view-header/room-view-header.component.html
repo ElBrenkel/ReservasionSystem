@@ -3,7 +3,7 @@
     <div class="container full-width">
         <div class="ml10">
             <span *ngIf="!isEditMode" class="roomName">
-                {{roomData.name}}
+                {{roomName()}}
             </span>
             <div *ngIf="isEditMode" class="editName">
                 <app-text-input [inputType]="roomNameInput.inputType" [label]="roomNameInput.label" [model]="roomData"
@@ -29,6 +29,11 @@
             </button>
             <button mat-icon-button *ngIf="roomData.isOwner" (click)="onEditClick()">
                 <mat-icon>{{editIcon}}</mat-icon>
+            </button>
+        </div>
+        <div *ngIf="isEditMode" class="activationButton">
+            <button mat-icon-button (click)="onActivationChanged()">
+                <mat-icon>{{activationIcon}}</mat-icon>
             </button>
         </div>
     </div>

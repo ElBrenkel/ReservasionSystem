@@ -1,7 +1,7 @@
 <mat-grid-list cols="3" rowHeight="1.5:1" gutterSize="5px">
   <mat-grid-tile *ngFor="let room of rooms">
     <app-room-card class="stretch" [roomId]="room.id" [roomName]="room.name" [roomAddress]="roomAddress(room)"
-      [isActive]="room.isActive">
+      [isActive]="room.isActive" [isOwner]="room.isOwner">
     </app-room-card>
   </mat-grid-tile>
 </mat-grid-list>

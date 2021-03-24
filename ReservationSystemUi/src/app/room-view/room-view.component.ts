@@ -15,6 +15,7 @@ export class RoomViewComponent implements OnInit {
   roomData: RoomData = null;
   loading = false;
   routerEventsSubscription: Subscription;
+  editMode = false;
 
   constructor(private api: ReservationSystemApiService, private router: Router) {
     this.routerEventsSubscription = this.router.events.subscribe(x => {
@@ -38,9 +39,13 @@ export class RoomViewComponent implements OnInit {
       console.log({ e });
     }
     this.loading = false;
-    if (!this.roomData || !this.roomData.isActive) {
+    if (!this.roomData || !this.roomActiveOrOwnedByUser()) {
       this.goToHome();
     }
+  }
+
+  roomActiveOrOwnedByUser(): boolean {
+    return this.roomData.isActive || this.roomData.isOwner;
   }
 
   ngOnDestroy(): void {
@@ -52,5 +57,9 @@ export class RoomViewComponent implements OnInit {
 
   goToHome() {
     this.router.navigate([""]);
+  }
+
+  editModeChanged(e: any): void {
+    this.editMode = e;
   }
 }
