@@ -1,6 +1,6 @@
 <mat-toolbar>
     <div class="left">
-        <button mat-icon-button>
+        <button mat-icon-button (click)="onProfile()">
             <mat-icon>person</mat-icon>
         </button>
     </div>
@@ -17,7 +17,7 @@
         </mat-form-field>
     </div>
     <div class="right">
-        <button mat-icon-button>
+        <button mat-icon-button (click)="onLogout()">
             <mat-icon>logout</mat-icon>
         </button>
     </div>

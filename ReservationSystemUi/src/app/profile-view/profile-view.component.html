@@ -1,0 +1,8 @@
+<div class="page-width">
+    <app-top-nav (onSearchClickedEvent)="goToHome()"></app-top-nav>
+    <div class="full-width mt10">
+        <app-edit-profile [user]="user"></app-edit-profile>
+        <mat-divider></mat-divider>
+        <app-change-password [user]="user"></app-change-password>
+    </div>
+</div>

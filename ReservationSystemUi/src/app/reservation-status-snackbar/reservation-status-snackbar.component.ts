@@ -21,6 +21,6 @@ export class ReservationStatusSnackbarComponent implements OnInit {
   }
 
   getMessage(): string {
-    return this.data.success ? "Reservation added." : this.data.message;
+    return this.data.message;
   }
 }

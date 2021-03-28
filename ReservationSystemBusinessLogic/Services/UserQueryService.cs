@@ -50,5 +50,14 @@ namespace ReservationSystemBusinessLogic.Services
                 BuildingNumber = user.BuildingNumber
             };
         }
+
+        public UserResponse GetUserById(long queryingUserId)
+        {
+            using (ReservationDataContext context = new ReservationDataContext())
+            {
+                User queryingUser = context.Users.Single(x => x.Id == queryingUserId);
+                return ConvertFromUser(queryingUser);
+            }
+        }
     }
 }

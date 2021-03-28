@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Utils } from '../common/utils';
+import { RoomData } from '../interfaces/roomData';
 import { WorkingHours } from '../interfaces/workingHours';
 
 @Component({
@@ -8,7 +9,7 @@ import { WorkingHours } from '../interfaces/workingHours';
   styleUrls: ['./room-view-working-hours.component.scss']
 })
 export class RoomViewWorkingHoursComponent implements OnInit {
-  @Input() workingHours: WorkingHours[] = [];
+  @Input() roomData: RoomData;
   sortedWorkingHours: any;
   activeDays: string[] = [];
 
@@ -16,7 +17,7 @@ export class RoomViewWorkingHoursComponent implements OnInit {
 
   ngOnInit(): void {
     this.sortedWorkingHours = {};
-    for (const workingHour of this.workingHours) {
+    for (const workingHour of this.roomData.workingHours) {
       if (!this.sortedWorkingHours[workingHour.day]) {
         this.sortedWorkingHours[workingHour.day] = [];
       }

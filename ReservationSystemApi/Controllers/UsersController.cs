@@ -73,7 +73,14 @@ namespace ReservationSystemApi.Controllers
             else
             {
                 UserQueryService userQueryService = new UserQueryService();
-                response = userQueryService.FindUser(username, queryingUserId.Value);
+                if (username == null)
+                {
+                    response = userQueryService.GetUserById(queryingUserId.Value);
+                }
+                else
+                {
+                    response = userQueryService.FindUser(username, queryingUserId.Value);
+                }
             }
 
             if (response == null)

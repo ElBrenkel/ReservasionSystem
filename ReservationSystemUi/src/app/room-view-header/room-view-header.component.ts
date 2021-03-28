@@ -4,11 +4,11 @@ import { Utils } from '../common/utils';
 import { RoomData } from '../interfaces/roomData';
 import { TextInputData } from '../interfaces/textInputData';
 import { ReservationSystemApiService } from '../reservation-system-api.service';
-import { debounce } from "lodash";
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { ConfirmDialogData } from '../interfaces/confirmDialogData';
-import { prepareEventListenerParameters } from '@angular/compiler/src/render3/view/template';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-room-view-header',
@@ -17,6 +17,7 @@ import { prepareEventListenerParameters } from '@angular/compiler/src/render3/vi
 })
 export class RoomViewHeaderComponent implements OnInit {
   @Input() roomData: RoomData;
+  @Input() isNew: boolean = false;
   @Output() editChanged: EventEmitter<any> = new EventEmitter();
   editIcon = "mode";
   isEditMode = false;
@@ -52,9 +53,12 @@ export class RoomViewHeaderComponent implements OnInit {
     placeholder: "City"
   }];
 
-  constructor(private api: ReservationSystemApiService, public dialog: MatDialog) { }
+  constructor(private api: ReservationSystemApiService, public dialog: MatDialog, public snackBar: MatSnackBar, private router: Router) { }
 
   ngOnInit(): void {
+    if (this.isNew) {
+      this.changeEditMode();
+    }
   }
 
   calcPicNumber(): number {
@@ -105,7 +109,54 @@ export class RoomViewHeaderComponent implements OnInit {
     return name;
   }
 
+  async addNewRoom(): Promise<boolean> {
+    const payload = {
+      id: this.roomData.id,
+      name: this.roomData.name,
+      country: "Israel",
+      city: this.roomData.city,
+      street: this.roomData.street,
+      buildingNumber: this.roomData.buildingNumber,
+      isActive: true,
+      size: 10,
+      maxNumberOfPeople: 10,
+      workinghours: this.roomData.workingHours
+    };
+
+    const response = await this.api.addRoomData(payload);
+    if (response.status.success) {
+      this.router.navigate([`room/${response.object.id}`]);
+    }
+    else {
+      console.log(response);
+    }
+
+    return response.status.success;
+  }
+
   async changeRoomData(): Promise<boolean> {
+    if (this.isNew) {
+      return await this.addNewRoom();
+    }
+    const roomEditSuccess = await this.editRoomData();
+    const workingHoursEditSuccess = await this.editWorkingHours();
+    return roomEditSuccess && workingHoursEditSuccess;
+  }
+
+  async editWorkingHours(): Promise<boolean> {
+    console.log(this.roomData.workingHours);
+    const response = await this.api.editWorkingHours(this.roomData.id, this.roomData.workingHours);
+    if (response.status.success) {
+      this.roomData.workingHours = response.object;
+    }
+    else {
+      Utils.openSnackbar(this.snackBar, false, response.status.message);
+    }
+
+    return response.status.success;
+  }
+
+  async editRoomData(): Promise<boolean> {
     const payload = {
       id: this.roomData.id,
       name: this.roomData.name,
@@ -116,7 +167,10 @@ export class RoomViewHeaderComponent implements OnInit {
 
     const response = await this.api.editRoomData(payload);
     if (response.status.success) {
-      this.roomData = response.object;
+      this.roomData.name = response.object.name;
+      this.roomData.street = response.object.street;
+      this.roomData.buildingNumber = response.object.buildingNumber;
+      this.roomData.city = response.object.city;
     }
     else {
       console.log(response);

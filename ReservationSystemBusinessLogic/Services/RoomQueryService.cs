@@ -70,7 +70,7 @@ namespace ReservationSystemBusinessLogic.Services
         {
             if (a == null || b == null)
             {
-                return false;
+                return true;
             }
 
             string lowerA = a.ToLower();

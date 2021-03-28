@@ -21,6 +21,12 @@ import { RoomEditWorkingHoursComponent } from './room-edit-working-hours/room-ed
 import { RoomAddReservationComponent } from './room-add-reservation/room-add-reservation.component';
 import { ReservationStatusSnackbarComponent } from './reservation-status-snackbar/reservation-status-snackbar.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import { ProfileViewComponent } from './profile-view/profile-view.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
+import { UserFieldComponent } from './user-field/user-field.component';
+import { NewRoomComponent } from './new-room/new-room.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +45,11 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
     RoomAddReservationComponent,
     ReservationStatusSnackbarComponent,
     ConfirmDialogComponent,
+    ProfileViewComponent,
+    EditProfileComponent,
+    ChangePasswordComponent,
+    UserFieldComponent,
+    NewRoomComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,7 +58,8 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
     AppMaterialModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxMaterialTimepickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

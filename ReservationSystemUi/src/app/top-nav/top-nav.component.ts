@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { debounce } from "lodash";
+import { ReservationSystemApiService } from '../reservation-system-api.service';
 
 @Component({
   selector: 'app-top-nav',
@@ -13,11 +15,11 @@ export class TopNavComponent implements OnInit {
 
   private debouncedEmitSearch = debounce(() => this.searchValueChangedEvent.emit(this.value), 250);
 
-  constructor() { }
+  constructor(private api: ReservationSystemApiService, private router: Router) { }
 
   ngOnInit(): void {
     this.value = sessionStorage["searchValue"] || "";
-    if (this.value) {
+    if (this.value != null) {
       this.onSearchChange(this.value);
     }
   }
@@ -32,5 +34,14 @@ export class TopNavComponent implements OnInit {
     if (this.onSearchClickedEvent) {
       this.onSearchClickedEvent.emit();
     }
+  }
+
+  async onLogout(): Promise<void> {
+    const response = await this.api.logout();
+    this.router.navigate(["login"]);
+  }
+
+  onProfile(): void {
+    this.router.navigate(["profile"]);
   }
 }

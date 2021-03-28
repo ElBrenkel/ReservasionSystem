@@ -6,7 +6,7 @@ img {
     border-radius: 10px;
 }
 
-.header {
+.card-header {
     position: absolute;
     height: 35px;
     width: 100%;
@@ -17,7 +17,7 @@ img {
     transition: height 0.3s ease-out, margin-top 0.3s ease-out;
 }
 
-.card-container:hover .header {
+.card-container:hover .card-header {
     height: 55px;
     margin-top: 55px;
 }

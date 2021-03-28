@@ -10,6 +10,35 @@
     margin-right: 2px;
 }
 
+.time-picker-container {
+    display: flex;
+    justify-content: center;
+}
+
+.price-container {
+    position: relative;
+    right: 0px;
+    width: 40px;
+    margin-top: -45px;
+    margin-left: 150px;
+}
+
+.add-button-container {
+    position: relative;
+    right: 0px;
+    width: 40px;
+    margin-top: -57px;
+    margin-left: 210px;
+}
+
+.price-input {
+    width: 50px;
+}
+
+.WH-width {
+    width: 130px;
+}
+
 .button-row {
     display: table-cell;
     width: 100%;
@@ -23,4 +52,46 @@
 .day-disabled {
     background-color: hsla(0, 0%, 100%, 0.12);
     color: hsla(0, 0%, 100%, 0.3);
+}
+
+.time-picker {
+    background-color: #303030;
+    box-shadow: none;
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+    border-bottom-style: groove;
+    border-width: 1px;
+    color: whitesmoke;
+    border-color: whitesmoke;
+    font-size: 1rem;
+    line-height: 1.1rem;
+    margin-bottom: 0;
+    padding: 6px;
+    width: 44px;
+}
+
+.time-picker:focus {
+    border-color: #9c27b0;
+}
+
+input:focus {
+    outline: none;
+}
+
+::ng-deep ngx-material-timepicker-content {
+    --body-background-color: #303030;
+    --primary-font-family: "Roboto", sans-serif;
+    --button-color: #9c27b0 !important;
+    --dial-active-color: #fff;
+    --dial-inactive-color: rgba(255, 255, 255, 0.5);
+    --dial-background-color: #9c27b0 !important;
+    --dial-editable-active-color: #9c27b0 !important;
+    --dial-editable-background-color: #fff;
+    --clock-face-time-active-color: whitesmoke;
+    --clock-face-time-inactive-color: #f0f0f0;
+    --clock-face-inner-time-inactive-color: #929292;
+    --clock-face-time-disabled-color: #c5c5c5;
+    --clock-face-background-color: #606060;
+    --clock-hand-color: #9c27b0 !important;
 }

@@ -1,4 +1,6 @@
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { RoomData } from "../interfaces/roomData";
+import { ReservationStatusSnackbarComponent } from "../reservation-status-snackbar/reservation-status-snackbar.component";
 
 export class Utils {
     public static dayStrings = {
@@ -38,5 +40,19 @@ export class Utils {
 
     public static addMinutes(date: Date, minutes: number): Date {
         return new Date(date.getTime() + minutes * 60000);
+    }
+
+    public static getMinutesFromTimeString(timeString: string) {
+        const parts = timeString.split(":");
+        const hours = Number.parseInt(parts[0]);
+        const minutes = Number.parseInt(parts[1]);
+        return hours * 60 + minutes;
+    }
+
+    public static openSnackbar(snackBar: MatSnackBar, success: boolean, message: string): void {
+        const data = { success, message };
+        const panelClass = success ? ['mat-toolbar', 'mat-primary'] : ['mat-toolbar', 'mat-warn'];
+        const duration = 5000;
+        snackBar.openFromComponent(ReservationStatusSnackbarComponent, { data, panelClass, duration });
     }
 }

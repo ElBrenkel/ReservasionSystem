@@ -11,6 +11,7 @@ import { RegisterPayload } from './interfaces/registerPayload';
 import { Reservation } from './interfaces/reservation';
 import { RoomData } from './interfaces/roomData';
 import { User } from './interfaces/user';
+import { WorkingHours } from './interfaces/workingHours';
 
 @Injectable({
   providedIn: 'root'
@@ -116,6 +117,18 @@ export class ReservationSystemApiService {
       });
   }
 
+  public addRoomData(roomData: RoomData): Promise<GenericObjectResponse<RoomData>> {
+    return this.http.post(`https://localhost:5001/api/room`, roomData, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericObjectResponse<RoomData>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericObjectResponse<RoomData>;
+      });
+  }
+
   public acceptReservation(roomId: number, requestId: number): Promise<GenericStatusMessage> {
     return this.http.post(`https://localhost:5001/api/room/${roomId}/request/${requestId}`, null, { headers: this.getHeaders() })
       .toPromise()
@@ -209,6 +222,18 @@ export class ReservationSystemApiService {
       .catch((r) => {
         console.log(r);
         return r.error as GenericStatusMessage;
+      });
+  }
+
+  public editWorkingHours(roomId: number, payload: WorkingHours[]): Promise<GenericObjectResponse<WorkingHours[]>> {
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/workingHours`, payload, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericObjectResponse<WorkingHours[]>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericObjectResponse<WorkingHours[]>;
       });
   }
 

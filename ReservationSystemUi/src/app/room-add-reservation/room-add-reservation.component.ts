@@ -97,13 +97,7 @@ export class RoomAddReservationComponent implements OnInit {
       this.slots = [];
       this.dateFormControl.setValue(new Date());
     }
-    this.openSnackbar(reservationStatus.status.success, reservationStatus.status.message);
-  }
 
-  openSnackbar(success: boolean, message: string): void {
-    const data = { success, message };
-    const panelClass = success ? ['mat-toolbar', 'mat-primary'] : ['mat-toolbar', 'mat-warn'];
-    const duration = 5000;
-    this.snackBar.openFromComponent(ReservationStatusSnackbarComponent, { data, panelClass, duration });
+    Utils.openSnackbar(this.snackBar, reservationStatus.status.success, reservationStatus.status.message || "Reservation sent.");
   }
 }

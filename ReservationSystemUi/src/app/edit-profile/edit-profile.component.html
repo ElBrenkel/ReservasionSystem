@@ -1,0 +1,16 @@
+<div>
+    <div class="header">Edit profile</div>
+    <div *ngIf="user">
+        <app-user-field [user]="user" prop="firstName" label="First name"
+            (valueChanged)="onValueChanged('firstName', $event)"></app-user-field>
+        <app-user-field [user]="user" prop="lastName" label="Last name"
+            (valueChanged)="onValueChanged('lastName', $event)">
+        </app-user-field>
+        <app-user-field [user]="user" prop="city" label="City" (valueChanged)="onValueChanged('city', $event)">
+        </app-user-field>
+        <app-user-field [user]="user" prop="street" label="Street" (valueChanged)="onValueChanged('street', $event)">
+        </app-user-field>
+        <app-user-field [user]="user" prop="buildingNumber" label="Building number" type="number"
+            (valueChanged)="onValueChanged('buildingNumber', $event)"></app-user-field>
+    </div>
+</div>

@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
 import { Utils } from '../common/utils';
+import { RoomData } from '../interfaces/roomData';
 import { WorkingHours } from '../interfaces/workingHours';
 
 @Component({
@@ -8,7 +9,7 @@ import { WorkingHours } from '../interfaces/workingHours';
   styleUrls: ['./room-edit-working-hours.component.scss']
 })
 export class RoomEditWorkingHoursComponent implements OnInit {
-  @Input() workingHours: WorkingHours[];
+  @Input() roomData: RoomData;
   sortedWorkingHours: any;
   activeDays: string[] = [];
   days = [];
@@ -37,7 +38,13 @@ export class RoomEditWorkingHoursComponent implements OnInit {
 
   onDayClicked(day: any): void {
     if (day.active) {
-      this.workingHours = this.workingHours.filter(x => x.day != day.key);
+      for (let i = 0; i < this.roomData.workingHours.length; i++) {
+        const workingHour = this.roomData.workingHours[i];
+        if (workingHour.day == day.key) {
+          this.roomData.workingHours.splice(i, 1);
+          i--;
+        }
+      }
     }
     else {
       const defaultWorkingHour: WorkingHours = {
@@ -46,7 +53,7 @@ export class RoomEditWorkingHoursComponent implements OnInit {
         timeEnd: 1080,
         priceForHour: 50
       };
-      this.workingHours.push(defaultWorkingHour);
+      this.roomData.workingHours.push(defaultWorkingHour);
     }
 
     this.constructSortedDays();
@@ -54,7 +61,7 @@ export class RoomEditWorkingHoursComponent implements OnInit {
 
   constructSortedDays(): void {
     this.sortedWorkingHours = {};
-    for (const workingHour of this.workingHours) {
+    for (const workingHour of this.roomData.workingHours) {
       if (!this.sortedWorkingHours[workingHour.day]) {
         this.sortedWorkingHours[workingHour.day] = [];
       }
@@ -76,5 +83,29 @@ export class RoomEditWorkingHoursComponent implements OnInit {
         dayObj.active = true;
       }
     }
+  }
+
+  getTimePickerValue(time: number): string {
+    return Utils.getHour(time);
+  }
+
+  onTimeSet(newTime: string, hours: WorkingHours, timeType: string): void {
+    if (timeType == "start") {
+      hours.timeStart = Utils.getMinutesFromTimeString(newTime);
+    }
+    else if (timeType == "end") {
+      hours.timeEnd = Utils.getMinutesFromTimeString(newTime);
+    }
+  }
+
+  onAddClick(day: any): void {
+    const defaultWorkingHour: WorkingHours = {
+      day: day * 1,
+      timeStart: 540,
+      timeEnd: 1080,
+      priceForHour: 50
+    };
+    this.roomData.workingHours.push(defaultWorkingHour);
+    this.constructSortedDays();
   }
 }

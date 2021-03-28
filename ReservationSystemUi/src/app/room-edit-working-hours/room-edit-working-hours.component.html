@@ -14,8 +14,36 @@
         <div class="day">{{getDayString(day)}}</div>
         <div class="time">
             <div *ngFor="let hours of sortedWorkingHours[day]">
-                {{getHour(hours.timeStart)}} - {{getHour(hours.timeEnd)}}
+                <div class="flex-container WH-width">
+                    <div class="time-picker-container">
+                        <input class="time-picker" [ngxTimepicker]="fullTimeStart" [format]="24"
+                            [value]="getTimePickerValue(hours.timeStart)" placeholder="17:00" aria-label="24hr format"
+                            readonly>
+                        <ngx-material-timepicker #fullTimeStart (timeSet)="onTimeSet($event, hours, 'start')">
+                        </ngx-material-timepicker>
+                    </div>
+                    <span> _ </span>
+                    <div class="time-picker-container">
+                        <input class="time-picker" [ngxTimepicker]="fullTimeEnd" [format]="24"
+                            [value]="getTimePickerValue(hours.timeEnd)" placeholder="17:00" aria-label="24hr format"
+                            readonly>
+                        <ngx-material-timepicker #fullTimeEnd (timeSet)="onTimeSet($event, hours, 'end')">
+                        </ngx-material-timepicker>
+                    </div>
+                    <div class="price-container">
+                        <mat-form-field class="price-input">
+                            <input matInput [(ngModel)]="hours.priceForHour" type="number" min="1">
+                            <span matSuffix>₪</span>
+                        </mat-form-field>
+                    </div>
+                </div>
             </div>
+            <div class="add-button-container">
+                <button mat-icon-button color="primary" (click)="onAddClick(day)">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <div class="divider"></div>
         </div>
     </div>
 </div>
