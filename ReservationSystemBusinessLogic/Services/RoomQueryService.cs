@@ -146,5 +146,16 @@ namespace ReservationSystemBusinessLogic.Services
                 return new GenericListResponse<AvailableReservationTime>(availableTimes, availableTimes.Count);
             }
         }
+
+        public GenericListResponse<RoomResponse> GetRoomsByOwner(long ownerId)
+        {
+            using (ReservationDataContext context = new ReservationDataContext())
+            {
+                List<Objects.Room> rooms = context.Rooms.Where(x => x.OwnerId == ownerId).ToList();
+                RoomManipulationService roomManipulationService = new RoomManipulationService();
+                List<RoomResponse> roomResponses = rooms.Select(x => roomManipulationService.ConvertRoomToResponse(x, ownerId)).ToList();
+                return new GenericListResponse<RoomResponse>(roomResponses, roomResponses.Count);
+            }
+        }
     }
 }

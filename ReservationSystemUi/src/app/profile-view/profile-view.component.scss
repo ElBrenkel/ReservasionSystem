@@ -1,0 +1,16 @@
+.right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.left {
+    flex: 1 0;
+    display: flex;
+}
+
+.text {
+    position: relative;
+    bottom: -5px;
+    left: 0px;
+}

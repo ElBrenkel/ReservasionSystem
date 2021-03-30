@@ -3,6 +3,22 @@
     <div class="full-width mt10">
         <app-edit-profile [user]="user"></app-edit-profile>
         <mat-divider></mat-divider>
-        <app-change-password [user]="user"></app-change-password>
+        <div class="mb10">
+            <app-change-password [user]="user"></app-change-password>
+        </div>
+        <mat-divider *ngIf="isOwner"></mat-divider>
+        <div *ngIf="isOwner" class="full-width mt10">
+            <div class="profile-container">
+                <span class="header left">
+                    <span class="text">Owned rooms</span>
+                    <span class="right">
+                        <button mat-button matSuffix mat-mini-fab color="primary" (click)="addNewRoom()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </span>
+                </span>
+            </div>
+            <app-search-results [rooms]="rooms"></app-search-results>
+        </div>
     </div>
 </div>

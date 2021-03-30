@@ -56,8 +56,44 @@ export class ReservationSystemApiService {
       });
   }
 
+  public isRoomOwner(): Promise<boolean> {
+    return this.http.get(`https://localhost:5001/api/user/isRoomOwner`, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return true;
+      })
+      .catch((r) => {
+        console.log(r);
+        return false;
+      });
+  }
+
   public searchRooms(searchQuery: string): Promise<GenericList<RoomData>> {
     return this.http.get(`https://localhost:5001/api/room/search?city=${searchQuery}&name=${searchQuery}&take=1000`, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericList<RoomData>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericList<RoomData>;
+      });
+  }
+
+  public getReservations(roomId: number): Promise<GenericList<Reservation>> {
+    return this.http.get(`https://localhost:5001/api/room/${roomId}/request/list?take=1000`, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericList<Reservation>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericList<Reservation>;
+      });
+  }
+
+  public getOwnedRooms(): Promise<GenericList<RoomData>> {
+    return this.http.get(`https://localhost:5001/api/user/rooms`, { headers: this.getHeaders() })
       .toPromise()
       .then((r) => {
         return r as GenericList<RoomData>;
@@ -130,7 +166,7 @@ export class ReservationSystemApiService {
   }
 
   public acceptReservation(roomId: number, requestId: number): Promise<GenericStatusMessage> {
-    return this.http.post(`https://localhost:5001/api/room/${roomId}/request/${requestId}`, null, { headers: this.getHeaders() })
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/request/${requestId}/accept`, null, { headers: this.getHeaders() })
       .toPromise()
       .then((r) => {
         return r as GenericStatusMessage;
@@ -142,7 +178,7 @@ export class ReservationSystemApiService {
   }
 
   public rejectReservation(roomId: number, requestId: number): Promise<GenericStatusMessage> {
-    return this.http.post(`https://localhost:5001/api/room/${roomId}/request/${requestId}`, null, { headers: this.getHeaders() })
+    return this.http.post(`https://localhost:5001/api/room/${roomId}/request/${requestId}/reject`, null, { headers: this.getHeaders() })
       .toPromise()
       .then((r) => {
         return r as GenericStatusMessage;

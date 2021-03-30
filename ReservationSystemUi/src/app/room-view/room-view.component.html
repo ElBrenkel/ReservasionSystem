@@ -4,13 +4,15 @@
         <app-room-view-header [roomData]="roomData" (editChanged)="editModeChanged($event)"></app-room-view-header>
         <mat-grid-list cols="12" rowHeight="1000px" class="full-width mt10">
             <mat-grid-tile colspan="9" rowspan="1">
-                <div>
+                <div *ngIf="editMode" class="full-width calendar-view-container">
+                    <app-reservation-calendar [roomId]="roomData.id"></app-reservation-calendar>
+                </div>
+                <div *ngIf="!editMode">
                     <app-room-add-reservation class="full-width" [roomData]="roomData"></app-room-add-reservation>
                 </div>
             </mat-grid-tile>
             <mat-grid-tile colspan="3" rowspan="1">
-                <app-room-view-working-hours *ngIf="!editMode" class="full-width"
-                    [roomData]="roomData">
+                <app-room-view-working-hours *ngIf="!editMode" class="full-width" [roomData]="roomData">
                 </app-room-view-working-hours>
                 <app-room-edit-working-hours *ngIf="editMode" class="full-width" [roomData]="roomData">
                 </app-room-edit-working-hours>

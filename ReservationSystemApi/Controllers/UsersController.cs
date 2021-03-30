@@ -104,6 +104,33 @@ namespace ReservationSystemApi.Controllers
             return new GenericStatusMessage(true);
         }
 
+        [HttpGet("isRoomOwner")]
+        public GenericStatusMessage IsRoomOwner()
+        {
+            long? queryingUserId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
+            if (queryingUserId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericStatusMessage(false, $"Unauthorized request.");
+            }
+
+            return new GenericStatusMessage(true);
+        }
+
+        [HttpGet("rooms")]
+        public GenericListResponse<RoomResponse> GetOwnerRooms()
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericListResponse<RoomResponse>("");
+            }
+
+            RoomQueryService queryService = new RoomQueryService();
+            return queryService.GetRoomsByOwner(userId.Value);
+        }
+
         [HttpPost("changePassword")]
         public GenericStatusMessage ChangePassword([FromBody] PasswordChangePayload payload)
         {

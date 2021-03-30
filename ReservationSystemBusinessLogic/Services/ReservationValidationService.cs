@@ -25,7 +25,7 @@ namespace ReservationSystemBusinessLogic.Services
 
         private GenericStatusMessage ValidateRoomAvailability(ReservationDataContext context, ReservationRequest request)
         {
-            Room room = context.Rooms.SingleOrDefault(x => x.Id == request.RoomId);
+            Room room = context.Rooms.Include(x => x.WorkingHours).SingleOrDefault(x => x.Id == request.RoomId);
             ReservationRequestPayload payload = new ReservationRequestPayload
             {
                 RentStart = request.RentStart,
@@ -58,11 +58,17 @@ namespace ReservationSystemBusinessLogic.Services
                 return new GenericStatusMessage(false, "Reservation is not in the rooms working hours.");
             }
 
-            bool collision = context.ReservationRequests.Any(x => x.RoomId == room.Id
+            var todaysReservations = context.ReservationRequests.Where(x => x.RoomId == room.Id
                 && x.Status == ReservationStatus.Approved
-                && DbFunctions.TruncateTime(x.RentStart) == DbFunctions.TruncateTime(payload.RentStart)
-                && ((x.RentStart >= payload.RentStart && x.RentEnd <= payload.RentStart)
-                    || (x.RentStart >= payload.RentEnd && x.RentEnd <= payload.RentEnd)));
+                && DbFunctions.TruncateTime(x.RentStart) == DbFunctions.TruncateTime(payload.RentStart)).ToList();
+            bool collision = todaysReservations.Any(x =>
+            {
+                bool startValidation = payload.RentStart > x.RentStart && payload.RentStart < x.RentEnd;
+                bool endValidation = payload.RentEnd > x.RentStart && payload.RentEnd < x.RentEnd;
+                bool sameTimeValidation = payload.RentStart == x.RentStart && payload.RentEnd == x.RentEnd;
+                return startValidation || endValidation || sameTimeValidation;
+            });
+
             if (collision)
             {
                 return new GenericStatusMessage(false, "Reservation collides with an already approved reservation.");

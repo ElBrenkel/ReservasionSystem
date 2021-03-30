@@ -6,7 +6,7 @@ img {
     border-radius: 10px;
 }
 
-.card-header {
+.room-card-header {
     position: absolute;
     height: 35px;
     width: 100%;
@@ -17,9 +17,9 @@ img {
     transition: height 0.3s ease-out, margin-top 0.3s ease-out;
 }
 
-.card-container:hover .card-header {
-    height: 55px;
-    margin-top: 55px;
+.card-container:hover .room-card-header {
+    height: 60px;
+    margin-top: 60px;
 }
 
 .room-address {
@@ -33,7 +33,6 @@ img {
 .room-name {
     font-size: 1.5rem;
     font-weight: 400;
-    margin-top: 3px;
 }
 
 .overlay {

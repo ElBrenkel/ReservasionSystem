@@ -22,12 +22,14 @@ namespace ReservationSystemBusinessLogic.Services
                     && (x.Status != ReservationStatus.Rejected || (room.OwnerId == userId || x.UserId == userId)));
                 List<ReservationRequest> reservationList = reservationsQuery.Skip(skip).Take(take).ToList();
                 int totalCount = reservationsQuery.Count();
+                long[] reservationIds = reservationList.Select(x => x.Id).ToArray();
+                List<ReservationRequest> expandedReservationList = context.ReservationRequests.Include(x => x.User).Where(x => reservationIds.Contains(x.Id)).ToList();
                 ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
-                List<ReservationRequestResponse> reservationResponses = reservationList.Select(x =>
+                List<ReservationRequestResponse> reservationResponses = expandedReservationList.Select(x =>
                 {
                     bool returnAllData = room.OwnerId == userId || x.UserId == userId;
                     return reservationManipulationService.ConvertToResponse(x, returnAllData);
-                }).ToList();
+                }).OrderBy(x => x.RentStart).ToList();
 
                 return new GenericListResponse<ReservationRequestResponse>(reservationResponses, totalCount);
             }

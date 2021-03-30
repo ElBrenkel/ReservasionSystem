@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -27,6 +26,10 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { UserFieldComponent } from './user-field/user-field.component';
 import { NewRoomComponent } from './new-room/new-room.component';
+import { ReservationCalendarComponent } from './reservation-calendar/reservation-calendar.component';
+import { CalendarModule, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { ReservationCalendarHeaderComponent } from './reservation-calendar-header/reservation-calendar-header.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +53,8 @@ import { NewRoomComponent } from './new-room/new-room.component';
     ChangePasswordComponent,
     UserFieldComponent,
     NewRoomComponent,
+    ReservationCalendarComponent,
+    ReservationCalendarHeaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -59,7 +64,11 @@ import { NewRoomComponent } from './new-room/new-room.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgxMaterialTimepickerModule
+    NgxMaterialTimepickerModule,
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory,
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -10,7 +10,7 @@
             </div>
         </div>
     </div>
-    <div *ngFor="let day of activeDays" class="container full-width">
+    <div *ngFor="let day of activeDays" class="full-width">
         <div class="day">{{getDayString(day)}}</div>
         <div class="time">
             <div *ngFor="let hours of sortedWorkingHours[day]">

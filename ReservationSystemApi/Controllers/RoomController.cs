@@ -228,7 +228,7 @@ namespace ReservationSystemApi.Controllers
         }
 
         [HttpGet("{roomId}/request/list")]
-        public GenericListResponse<ReservationRequestResponse> GetReservationsByDate(long roomId, [FromQuery] DateTime startDate, [FromQuery] DateTime EndDate,
+        public GenericListResponse<ReservationRequestResponse> GetReservationsByDate(long roomId, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate,
             [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
@@ -246,8 +246,10 @@ namespace ReservationSystemApi.Controllers
                 return new GenericListResponse<ReservationRequestResponse>("Not found.");
             }
 
+            DateTime defaultStartDate = startDate ?? DateTime.Today;
+            DateTime defaultEndDate = endDate ?? defaultStartDate + TimeSpan.FromDays(180);
             ReservationQueryService queryService = new ReservationQueryService();
-            return queryService.GetReservationsByDate(roomId, startDate, EndDate, userId.Value, skip, take);
+            return queryService.GetReservationsByDate(roomId, defaultStartDate, defaultEndDate, userId.Value, skip, take);
         }
 
         [HttpPost("{roomId}/deactivate")]

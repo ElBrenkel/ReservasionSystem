@@ -1,6 +1,6 @@
 <div class="full-width">
     <div class="header">Active hours</div>
-    <div *ngFor="let day of activeDays" class="container full-width">
+    <div *ngFor="let day of activeDays" class="working-hours-container full-width">
         <div class="day">{{getDayString(day)}}</div>
         <div class="time">
             <div *ngFor="let hours of sortedWorkingHours[day]">

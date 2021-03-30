@@ -9,8 +9,11 @@ namespace ReservationSystemBusinessLogic.Objects.Api
 {
     public class ReservationRequestResponse
     {
+        public long? Id { get; set; }
 
         public long? UserId { get; set; }
+
+        public string UserFullName { get; set; }
 
         public long? RoomId { get; set; }
 
