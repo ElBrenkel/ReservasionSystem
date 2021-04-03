@@ -134,6 +134,10 @@ export class RegisterComponent implements OnInit {
       });
   }
 
+  onBback() {
+    this.router.navigate(["login"]);
+  }
+
   onClear() {
     this.registerPayload = {
       username: "",
