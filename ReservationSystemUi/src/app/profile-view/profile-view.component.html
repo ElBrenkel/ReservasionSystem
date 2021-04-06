@@ -6,7 +6,7 @@
         <div class="mb10">
             <app-change-password [user]="user"></app-change-password>
         </div>
-        <mat-divider *ngIf="isOwner"></mat-divider>
+        <mat-divider></mat-divider>
         <div *ngIf="isOwner" class="full-width mt10">
             <div class="profile-container">
                 <span class="header left">
@@ -19,6 +19,12 @@
                 </span>
             </div>
             <app-search-results [rooms]="rooms"></app-search-results>
+        </div>
+        <div *ngIf="!isOwner" class="full-width mt10">
+            <span class="header left">
+                <span class="text">Reservations status</span>
+            </span>
+            <app-reservation-calendar></app-reservation-calendar>
         </div>
     </div>
 </div>

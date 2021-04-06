@@ -31,6 +31,7 @@ export class ReservationCalendarComponent implements OnInit {
   @Input() roomId: number;
   reservations: Reservation[] = [];
   viewDate = new Date();
+  viewMode: boolean = true;
 
   actions: CalendarEventAction[] = [
     {
@@ -71,11 +72,12 @@ export class ReservationCalendarComponent implements OnInit {
 
   ngOnInit(): void {
     this.document.body.classList.add(this.darkThemeClass);
+    this.viewMode = !this.roomId;
     this.getReservations(true);
   }
 
   async getReservations(init: boolean) {
-    const response = await this.api.getReservations(this.roomId);
+    const response = this.viewMode ? await this.api.getUserReservations() : await this.api.getReservations(this.roomId);
     if (response.status.success) {
       this.reservations = response.items;
       this.createEvents();
@@ -98,7 +100,7 @@ export class ReservationCalendarComponent implements OnInit {
         start: new Date(reservation.rentStart),
         end: new Date(reservation.rentEnd),
         color: this.getEventColor(reservation),
-        actions: reservation.status === 1 ? this.actions : [],
+        actions: reservation.status === 1 && !this.viewMode ? this.actions : [],
         reservation: reservation
       }
 
@@ -106,7 +108,8 @@ export class ReservationCalendarComponent implements OnInit {
     }
   }
   getEventTitle(reservation: Reservation) {
-    return `${reservation.userFullName}: ${Utils.getHourFromDate(new Date(reservation.rentStart))} - ${Utils.getHourFromDate(new Date(reservation.rentEnd))}`
+
+    return `${this.viewMode ? reservation.roomName : reservation.userFullName}: ${Utils.getHourFromDate(new Date(reservation.rentStart))} - ${Utils.getHourFromDate(new Date(reservation.rentEnd))}`
   }
   getEventColor(reservation: Reservation) {
     return colors[(reservation.status || 1) - 1];

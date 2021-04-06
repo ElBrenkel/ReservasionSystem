@@ -17,6 +17,8 @@ namespace ReservationSystemBusinessLogic.Objects.Api
 
         public long? RoomId { get; set; }
 
+        public string RoomName { get; set; }
+
         public DateTime RentStart { get; set; }
 
         public DateTime RentEnd { get; set; }

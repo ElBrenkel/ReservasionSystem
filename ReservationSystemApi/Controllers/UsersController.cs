@@ -131,6 +131,20 @@ namespace ReservationSystemApi.Controllers
             return queryService.GetRoomsByOwner(userId.Value);
         }
 
+        [HttpGet("reservations")]
+        public GenericListResponse<ReservationRequestResponse> GetUserReservations()
+        {
+            long? userId = AuthenticationService.IsAuthorized(Request, UserRole.Coach, UserRole.RoomOwner);
+            if (userId == null)
+            {
+                Response.StatusCode = 401;
+                return new GenericListResponse<ReservationRequestResponse>("");
+            }
+
+            ReservationQueryService queryService = new ReservationQueryService();
+            return queryService.GetUserReservations(userId.Value);
+        }
+
         [HttpPost("changePassword")]
         public GenericStatusMessage ChangePassword([FromBody] PasswordChangePayload payload)
         {

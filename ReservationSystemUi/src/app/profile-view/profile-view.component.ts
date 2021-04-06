@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Reservation } from '../interfaces/reservation';
 import { RoomData } from '../interfaces/roomData';
 import { User } from '../interfaces/user';
 import { ReservationSystemApiService } from '../reservation-system-api.service';

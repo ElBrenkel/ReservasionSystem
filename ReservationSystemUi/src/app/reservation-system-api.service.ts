@@ -92,6 +92,18 @@ export class ReservationSystemApiService {
       });
   }
 
+  public getUserReservations(): Promise<GenericList<Reservation>> {
+    return this.http.get(`https://localhost:5001/api/user/reservations`, { headers: this.getHeaders() })
+      .toPromise()
+      .then((r) => {
+        return r as GenericList<Reservation>;
+      })
+      .catch((r) => {
+        console.log(r);
+        return r.error as GenericList<Reservation>;
+      });
+  }
+
   public getOwnedRooms(): Promise<GenericList<RoomData>> {
     return this.http.get(`https://localhost:5001/api/user/rooms`, { headers: this.getHeaders() })
       .toPromise()

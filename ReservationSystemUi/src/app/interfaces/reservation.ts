@@ -3,6 +3,7 @@ export interface Reservation {
     userId?: number,
     userFullName?: string,
     roomId?: number,
+    roomName?: string,
     rentStart: string,
     rentEnd: string,
     finalPrice?: number,

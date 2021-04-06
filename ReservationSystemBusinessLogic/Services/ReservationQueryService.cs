@@ -34,5 +34,20 @@ namespace ReservationSystemBusinessLogic.Services
                 return new GenericListResponse<ReservationRequestResponse>(reservationResponses, totalCount);
             }
         }
+
+        public GenericListResponse<ReservationRequestResponse> GetUserReservations(long userId)
+        {
+            using (ReservationDataContext context = new ReservationDataContext())
+            {
+                List<ReservationRequest> reservations = context.ReservationRequests.Include(x => x.Room).Where(x => x.UserId == userId).ToList();
+                ReservationManipulationService reservationManipulationService = new ReservationManipulationService();
+                List<ReservationRequestResponse> reservationResponses = reservations.Select(x =>
+                {
+                    bool returnAllData = x.Room.OwnerId == userId || x.UserId == userId;
+                    return reservationManipulationService.ConvertToResponse(x, returnAllData);
+                }).OrderBy(x => x.RentStart).ToList();
+                return new GenericListResponse<ReservationRequestResponse>(reservationResponses, reservationResponses.Count);
+            }
+        }
     }
 }

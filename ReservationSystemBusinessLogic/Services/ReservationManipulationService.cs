@@ -23,7 +23,8 @@ namespace ReservationSystemBusinessLogic.Services
             return new ReservationRequestResponse()
             {
                 Id = returnAllData ? request.Id : null,
-                RoomId = returnAllData ? request.RoomId : null,
+                RoomId = request.RoomId,
+                RoomName = request.Room?.Name,
                 UserId = returnAllData ? request.UserId : null,
                 UserFullName = returnAllData ? $"{request.User?.FirstName ?? ""} {request.User?.LastName ?? ""}" : null,
                 RentStart = request.RentStart,
